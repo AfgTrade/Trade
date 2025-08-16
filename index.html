@@ -1,372 +1,1923 @@
-<!--
-Single-file demo app: Firebase-authenticated wallet top-ups via Cryptomus (USDT BEP20)
--------------------------------------------------------------------------------------------------
-WHAT'S INSIDE
-1) index.html  — Frontend (Tailwind UI + Firebase Auth + Realtime DB). Calls your backend proxy.
-2) server.js   — Minimal Node/Express proxy + webhook to talk to Cryptomus securely (DON'T put API keys in frontend!)
-
-HOW TO RUN (quick start)
-A) Backend
-   1. Save the server.js section below into a separate file named server.js
-   2. npm init -y && npm i express cors body-parser node-fetch md5 firebase-admin
-   3. Fill CRYPTOMUS_API_KEY and MERCHANT_UUID in server.js (you provided API key). Set PORT & BASE_URL if you wish.
-   4. Configure Firebase Admin: add your service account JSON and set GOOGLE_APPLICATION_CREDENTIALS env var,
-      or paste the service account object inline as shown in comments.
-   5. node server.js
-
-B) Frontend
-   1. Keep this entire file as index.html and open it in a browser (or serve statically).
-   2. Make sure the FRONTEND_PROXY_BASE in the JS points to your backend, e.g. http://localhost:3000
-
-NOTES
-- We use Cryptomus "Static wallet" endpoint so each Add Funds creates a dedicated USDT(BEP20) address.
-- The webhook from Cryptomus credits the user's balance in Firebase when funds arrive.
-- If you'd rather lock a specific amount/address pair, switch to the "Invoice" endpoint in server.js (comment included).
-- Tested layout: modern, mobile-friendly. Tailwind via CDN. 
--------------------------------------------------------------------------------------------------
---><!DOCTYPE html><html lang="fa" dir="rtl">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Wallet Top‑Up (USDT BEP20) — Cryptomus + Firebase</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    html,body{font-family:Inter,system-ui,Segoe UI,Roboto,Arial,"Noto Sans",sans-serif;background:#0b0f1a;color:#e6ebff}
-    .card{background:#12182a;border:1px solid rgba(255,255,255,.06);box-shadow:0 8px 24px rgba(0,0,0,.25)}
-    .glass{backdrop-filter: blur(10px); background: rgba(255,255,255,0.06)}
-    input,button{border-radius:14px}
-  </style>
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-database-compat.js"></script>
-  <!-- QR Code -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afghan Shop - Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #343a40;
+            --secondary-color: #6c757d;
+            --accent-color: #ff6b00;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .sidebar {
+            background-color: var(--primary-color);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            padding-top: 20px;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 5px;
+            border-radius: 5px;
+            padding: 10px 15px;
+        }
+        
+        .sidebar .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .sidebar .nav-link.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            font-weight: 600;
+        }
+        
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+        
+        .badge-pending {
+            background-color: #ffc107;
+            color: var(--dark-color);
+        }
+        
+        .badge-completed {
+            background-color: #28a745;
+        }
+        
+        .badge-cancelled {
+            background-color: #dc3545;
+        }
+        
+        .btn-accent {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+        }
+        
+        .btn-accent:hover {
+            background-color: #e05d00;
+            border-color: #e05d00;
+            color: white;
+        }
+        
+        .stat-card {
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        .stat-card .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .stat-card .stat-label {
+            color: var(--secondary-color);
+            font-size: 14px;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 5px;
+            padding: 10px 15px;
+        }
+        
+        .image-preview {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
-<body class="min-h-screen">
-  <div class="max-w-5xl mx-auto py-10 px-4">
-    <header class="flex items-center justify-between mb-8">
-      <h1 class="text-2xl md:text-3xl font-bold">کیف پول ساده — USDT (BEP20)</h1>
-      <div id="authBox" class="text-sm"></div>
-    </header><!-- Auth Card -->
-<div id="authCard" class="card rounded-2xl p-6 mb-8">
-  <h2 class="text-xl font-semibold mb-4">ننوتل یا حساب جوړول</h2>
-  <div class="grid md:grid-cols-2 gap-4">
-    <input id="email" type="email" placeholder="ایمیل" class="w-full p-3 bg-[#0e1424] border border-white/10 focus:outline-none"/>
-    <input id="password" type="password" placeholder="پاسورډ" class="w-full p-3 bg-[#0e1424] border border-white/10 focus:outline-none"/>
-  </div>
-  <div class="flex flex-wrap gap-3 mt-4">
-    <button id="btnSignUp" class="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 transition font-semibold">اکاونټ جوړ کړه</button>
-    <button id="btnSignIn" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 transition font-semibold">ننوتل</button>
-    <button id="btnSignOut" class="px-4 py-2 bg-rose-500 hover:bg-rose-600 transition font-semibold hidden">وتل</button>
-  </div>
-  <p class="text-amber-300 text-sm mt-3">یادونه: لومړی باید د ایمیل/پاسورډ له لارې ننوتل/حساب جوړ کړئ.</p>
-</div>
-
-<!-- Dashboard -->
-<section id="dash" class="hidden">
-  <div class="grid md:grid-cols-3 gap-6">
-    <div class="card rounded-2xl p-6 md:col-span-1">
-      <h3 class="text-lg font-semibold mb-2">ستاسو بیلانس</h3>
-      <div class="text-4xl font-bold" id="balance">0.00 <span class="text-base font-semibold">USDT</span></div>
-      <p class="text-white/70 mt-2 text-sm">شبکه: <b>BEP20 (BSC)</b></p>
-    </div>
-
-    <div class="card rounded-2xl p-6 md:col-span-2">
-      <h3 class="text-lg font-semibold mb-3">فاند اضافه کول</h3>
-      <div class="grid md:grid-cols-4 gap-3 items-center">
-        <label class="md:col-span-1 text-sm">مقدار (USDT):</label>
-        <input id="amount" type="number" min="1" step="0.01" class="md:col-span-2 p-3 bg-[#0e1424] border border-white/10 focus:outline-none" placeholder="لکه 25"/>
-        <button id="btnAdd" class="md:col-span-1 px-4 py-2 bg-sky-500 hover:bg-sky-600 font-semibold">Add</button>
-      </div>
-      <p class="text-xs text-white/70 mt-3">د Add کلیک وروسته، د Cryptomus له لارې د USDT(BEP20) ادرس تولیدیږي. ورته مقدار واستوئ؛ کله چې تایید شي، بیلانس اتومات اپډیټ کېږي.</p>
-    </div>
-  </div>
-
-  <div id="depositCard" class="card rounded-2xl p-6 mt-6 hidden">
-    <div class="flex items-center justify-between">
-      <h3 class="text-lg font-semibold">د ډیپازیت جزییات</h3>
-      <button id="btnCloseDeposit" class="text-sm text-white/70 hover:text-white">بندول</button>
-    </div>
-    <div class="grid md:grid-cols-2 gap-6 mt-4">
-      <div>
-        <p class="text-sm text-white/70">د تادیې ادرس (USDT / BEP20):</p>
-        <div class="mt-2 p-3 bg-[#0e1424] border border-white/10 rounded-xl break-all" id="payAddress">—</div>
-        <div class="mt-3 flex gap-3">
-          <button id="copyAddr" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-sm">Copy</button>
-          <a id="payLink" href="#" target="_blank" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-sm">د تادیې پاڼه</a>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar d-none d-md-block" style="width: 250px;">
+            <div class="text-center mb-4">
+                <h4>Afghan Shop</h4>
+                <p class="text-muted">Admin Panel</p>
+            </div>
+            
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#" data-section="dashboard">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-section="diamonds">
+                        <i class="fas fa-gem"></i> Diamonds/UC
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-section="accounts">
+                        <i class="fas fa-user-tag"></i> Game Accounts
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-section="withdrawals">
+                        <i class="fas fa-hand-holding-usd"></i> Withdrawals
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-section="orders">
+                        <i class="fas fa-shopping-cart"></i> Orders
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-section="users">
+                        <i class="fas fa-users"></i> Users
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-section="notifications">
+                        <i class="fas fa-bell"></i> Notifications
+                    </a>
+                </li>
+                <li class="nav-item mt-3">
+                    <a class="nav-link" href="#" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </li>
+            </ul>
         </div>
-      </div>
-      <div>
-        <p class="text-sm text-white/70">QR:</p>
-        <div id="qrcode" class="mt-2 bg-white rounded-xl p-2 w-[220px]"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card rounded-2xl p-6 mt-6">
-    <h3 class="text-lg font-semibold mb-3">د ډیپازیت ریکارډونه</h3>
-    <div id="deposits" class="space-y-2 text-sm"></div>
-  </div>
-</section>
-
-  </div><script>
-// ====== CONFIG ======
-const FRONTEND_PROXY_BASE = 'http://localhost:3000'; // Your Express server
-
-// Firebase config (provided)
-const firebaseConfig = {
-  apiKey: "AIzaSyD4UbW_Iy4kUWH3V70Q1mWCI4-_KFk6ku4",
-  authDomain: "onlinewark-a0147.firebaseapp.com",
-  databaseURL: "https://onlinewark-a0147-default-rtdb.firebaseio.com",
-  projectId: "onlinewark-a0147",
-  storageBucket: "onlinewark-a0147.appspot.com",
-  messagingSenderId: "92155538620",
-  appId: "1:92155538620:android:5e198a8eea6bf17f61f4b9"
-};
-
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.database();
-
-// UI helpers
-const $ = (id)=>document.getElementById(id);
-const toast = (msg)=>{
-  const el=document.createElement('div');
-  el.className='fixed bottom-6 left-1/2 -translate-x-1/2 bg-black/80 text-white px-4 py-2 rounded-xl';
-  el.textContent=msg; document.body.appendChild(el); setTimeout(()=>el.remove(),3000);
-}
-
-// Auth actions
-$('btnSignUp').onclick = async ()=>{
-  const email=$('email').value.trim(); const pass=$('password').value;
-  try{ await auth.createUserWithEmailAndPassword(email,pass); toast('اکاونټ جوړ شو'); }
-  catch(e){ toast(e.message) }
-}
-$('btnSignIn').onclick = async ()=>{
-  const email=$('email').value.trim(); const pass=$('password').value;
-  try{ await auth.signInWithEmailAndPassword(email,pass); toast('بریالي ننوتل'); }
-  catch(e){ toast(e.message) }
-}
-$('btnSignOut').onclick = ()=> auth.signOut();
-
-// Realtime listeners
-let userRef=null, depsRef=null;
-auth.onAuthStateChanged(async (u)=>{
-  if(u){
-    $('authCard').classList.add('hidden');
-    $('dash').classList.remove('hidden');
-    $('btnSignOut').classList.remove('hidden');
-    $('authBox').innerHTML = `<span class="opacity-80 text-xs">${u.email}</span>`;
-    userRef = db.ref(`users/${u.uid}`);
-    depsRef = db.ref(`deposits/${u.uid}`);
-
-    // init defaults
-    userRef.child('balance').once('value').then(s=>{ if(s.val()==null) userRef.update({balance:0}); });
-
-    // subscribe balance
-    userRef.child('balance').on('value', s=>{ const b=(s.val()||0).toFixed(2); $('balance').innerHTML = `${b} <span class="text-base font-semibold">USDT</span>`; });
-
-    // render deposits
-    depsRef.on('value', s=>{
-      const data=s.val()||{}; const list=Object.values(data).sort((a,b)=>b.created-a.created);
-      $('deposits').innerHTML = list.map(d=>`<div class="glass rounded-xl p-3 flex flex-wrap gap-3 items-center">
-        <div class="grow">
-          <div class="font-semibold">${d.amount} USDT — <span class="uppercase">${d.network}</span></div>
-          <div class="text-white/70">Status: <b>${d.status}</b> • <span class="break-all">${d.address||''}</span></div>
+        
+        <!-- Main Content -->
+        <div class="main-content flex-grow-1">
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="content-section">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3>Dashboard</h3>
+                    <div class="text-muted">
+                        <span id="currentDate"></span>
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card stat-card">
+                            <div class="card-body">
+                                <div class="stat-value" id="totalUsers">0</div>
+                                <div class="stat-label">Total Users</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stat-card">
+                            <div class="card-body">
+                                <div class="stat-value" id="totalOrders">0</div>
+                                <div class="stat-label">Total Orders</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stat-card">
+                            <div class="card-body">
+                                <div class="stat-value" id="pendingWithdrawals">0</div>
+                                <div class="stat-label">Pending Withdrawals</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stat-card">
+                            <div class="card-body">
+                                <div class="stat-value" id="totalRevenue">$0</div>
+                                <div class="stat-label">Total Revenue</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                Recent Orders
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Type</th>
+                                                <th>Amount</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="recentOrders">
+                                            <!-- Orders will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                Pending Withdrawals
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>User</th>
+                                                <th>FF ID</th>
+                                                <th>Amount</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="pendingWithdrawalsList">
+                                            <!-- Withdrawals will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Diamonds/UC Section -->
+            <section id="diamonds-section" class="content-section" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3>Diamonds & UC Management</h3>
+                    <button class="btn btn-accent" data-bs-toggle="modal" data-bs-target="#addPackageModal">
+                        <i class="fas fa-plus me-2"></i> Add Package
+                    </button>
+                </div>
+                
+                <ul class="nav nav-tabs" id="currencyTabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#diamondsTab">Free Fire Diamonds</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#ucTab">PUBG UC</a>
+                    </li>
+                </ul>
+                
+                <div class="tab-content mt-3">
+                    <div class="tab-pane fade show active" id="diamondsTab">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Amount</th>
+                                        <th>Price (USD)</th>
+                                        <th>Price (AFN)</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="diamondsTable">
+                                    <!-- Diamonds packages will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="ucTab">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Amount</th>
+                                        <th>Price (USD)</th>
+                                        <th>Price (AFN)</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ucTable">
+                                    <!-- UC packages will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Game Accounts Section -->
+            <section id="accounts-section" class="content-section" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3>Game Accounts Management</h3>
+                    <button class="btn btn-accent" data-bs-toggle="modal" data-bs-target="#addAccountModal">
+                        <i class="fas fa-plus me-2"></i> Add Account
+                    </button>
+                </div>
+                
+                <ul class="nav nav-tabs" id="gameTabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#freefireTab">Free Fire</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#pubgTab">PUBG</a>
+                    </li>
+                </ul>
+                
+                <div class="tab-content mt-3">
+                    <div class="tab-pane fade show active" id="freefireTab">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Level</th>
+                                        <th>Price (USD)</th>
+                                        <th>Price (AFN)</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="freefireTable">
+                                    <!-- Free Fire accounts will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="pubgTab">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Level</th>
+                                        <th>Price (USD)</th>
+                                        <th>Price (AFN)</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pubgTable">
+                                    <!-- PUBG accounts will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Withdrawals Section -->
+            <section id="withdrawals-section" class="content-section" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3>Withdrawal Requests</h3>
+                    <div class="btn-group">
+                        <button class="btn btn-outline-secondary active" data-filter="all">All</button>
+                        <button class="btn btn-outline-secondary" data-filter="pending">Pending</button>
+                        <button class="btn btn-outline-secondary" data-filter="completed">Completed</button>
+                        <button class="btn btn-outline-secondary" data-filter="cancelled">Cancelled</button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>FF ID</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="withdrawalsTable">
+                            <!-- Withdrawals will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- Orders Section -->
+            <section id="orders-section" class="content-section" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3>Orders Management</h3>
+                    <div class="btn-group">
+                        <button class="btn btn-outline-secondary active" data-filter="all">All</button>
+                        <button class="btn btn-outline-secondary" data-filter="pending">Pending</button>
+                        <button class="btn btn-outline-secondary" data-filter="completed">Completed</button>
+                        <button class="btn btn-outline-secondary" data-filter="cancelled">Cancelled</button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTable">
+                            <!-- Orders will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- Users Section -->
+            <section id="users-section" class="content-section" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3>Users Management</h3>
+                    <div class="input-group" style="width: 300px;">
+                        <input type="text" class="form-control" placeholder="Search users..." id="userSearch">
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Email</th>
+                                <th>Referrals</th>
+                                <th>Balance</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTable">
+                            <!-- Users will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- Notifications Section -->
+            <section id="notifications-section" class="content-section" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3>Send Notification</h3>
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <form id="notificationForm">
+                            <div class="mb-3">
+                                <label for="notificationTitle" class="form-label">Title</label>
+                                <input type="text" class="form-control" id="notificationTitle" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="notificationMessage" class="form-label">Message</label>
+                                <textarea class="form-control" id="notificationMessage" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Send To</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="notificationTarget" id="allUsers" value="all" checked>
+                                    <label class="form-check-label" for="allUsers">
+                                        All Users
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="notificationTarget" id="specificUser" value="specific">
+                                    <label class="form-check-label" for="specificUser">
+                                        Specific User
+                                    </label>
+                                </div>
+                                <div class="mt-2" id="userSelectContainer" style="display: none;">
+                                    <select class="form-select" id="notificationUser">
+                                        <!-- Users will be loaded here -->
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-accent">
+                                <i class="fas fa-paper-plane me-2"></i> Send Notification
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <h4 class="mt-4 mb-3">Notification History</h4>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Message</th>
+                                <th>Sent To</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="notificationsTable">
+                            <!-- Notifications will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </div>
-        ${d.url?`<a class="text-sky-300 underline" target="_blank" href="${d.url}">Pay page</a>`:''}
-      </div>`).join('');
-    });
-  } else {
-    $('dash').classList.add('hidden');
-    $('authCard').classList.remove('hidden');
-    $('btnSignOut').classList.add('hidden');
-    $('authBox').innerHTML = '';
-    if(userRef){userRef.off();} if(depsRef){depsRef.off();}
-  }
-});
+    </div>
+    
+    <!-- Add Package Modal -->
+    <div class="modal fade" id="addPackageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Package</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="packageForm">
+                        <div class="mb-3">
+                            <label for="packageType" class="form-label">Package Type</label>
+                            <select class="form-select" id="packageType" required>
+                                <option value="diamonds">Free Fire Diamonds</option>
+                                <option value="uc">PUBG UC</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="packageAmount" class="form-label">Amount</label>
+                            <input type="number" class="form-control" id="packageAmount" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="packagePriceUsd" class="form-label">Price (USD)</label>
+                            <input type="number" step="0.01" class="form-control" id="packagePriceUsd" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="packagePriceAfn" class="form-label">Price (AFN)</label>
+                            <input type="number" class="form-control" id="packagePriceAfn" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-accent" id="savePackageBtn">Save Package</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Package Modal -->
+    <div class="modal fade" id="editPackageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Package</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editPackageForm">
+                        <input type="hidden" id="editPackageId">
+                        <input type="hidden" id="editPackageDb">
+                        <div class="mb-3">
+                            <label for="editPackageAmount" class="form-label">Amount</label>
+                            <input type="number" class="form-control" id="editPackageAmount" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPackagePriceUsd" class="form-label">Price (USD)</label>
+                            <input type="number" step="0.01" class="form-control" id="editPackagePriceUsd" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editPackagePriceAfn" class="form-label">Price (AFN)</label>
+                            <input type="number" class="form-control" id="editPackagePriceAfn" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-accent" id="updatePackageBtn">Update Package</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Account Modal -->
+    <div class="modal fade" id="addAccountModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Game Account</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="accountForm">
+                        <div class="mb-3">
+                            <label for="accountGame" class="form-label">Game</label>
+                            <select class="form-select" id="accountGame" required>
+                                <option value="freefire">Free Fire</option>
+                                <option value="pubg">PUBG Mobile</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="accountName" class="form-label">Account Name</label>
+                            <input type="text" class="form-control" id="accountName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="accountLevel" class="form-label">Level</label>
+                            <input type="number" class="form-control" id="accountLevel" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="accountPriceUsd" class="form-label">Price (USD)</label>
+                            <input type="number" step="0.01" class="form-control" id="accountPriceUsd" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="accountPriceAfn" class="form-label">Price (AFN)</label>
+                            <input type="number" class="form-control" id="accountPriceAfn" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="accountDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="accountDescription" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Images (Upload 4 images)</label>
+                            <input type="file" class="form-control" id="accountImages" multiple accept="image/*">
+                            <div class="mt-2" id="imagePreviews"></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-accent" id="saveAccountBtn">Save Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Account Modal -->
+    <div class="modal fade" id="editAccountModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Game Account</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editAccountForm">
+                        <input type="hidden" id="editAccountId">
+                        <div class="mb-3">
+                            <label for="editAccountName" class="form-label">Account Name</label>
+                            <input type="text" class="form-control" id="editAccountName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editAccountLevel" class="form-label">Level</label>
+                            <input type="number" class="form-control" id="editAccountLevel" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editAccountPriceUsd" class="form-label">Price (USD)</label>
+                            <input type="number" step="0.01" class="form-control" id="editAccountPriceUsd" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editAccountPriceAfn" class="form-label">Price (AFN)</label>
+                            <input type="number" class="form-control" id="editAccountPriceAfn" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editAccountDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="editAccountDescription" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Current Images</label>
+                            <div id="currentImages"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Update Images (Optional)</label>
+                            <input type="file" class="form-control" id="editAccountImages" multiple accept="image/*">
+                            <div class="mt-2" id="editImagePreviews"></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-accent" id="updateAccountBtn">Update Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- View Order Modal -->
+    <div class="modal fade" id="viewOrderModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Order Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <h6>Order ID</h6>
+                        <p id="orderIdText"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>User</h6>
+                        <p id="orderUser"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Type</h6>
+                        <p id="orderType"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Amount</h6>
+                        <p id="orderAmount"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Price</h6>
+                        <p id="orderPrice"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Status</h6>
+                        <p id="orderStatus"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Date</h6>
+                        <p id="orderDate"></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <div id="orderActionButtons">
+                        <!-- Action buttons will be added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- View Withdrawal Modal -->
+    <div class="modal fade" id="viewWithdrawalModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Withdrawal Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <h6>Withdrawal ID</h6>
+                        <p id="withdrawalIdText"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>User</h6>
+                        <p id="withdrawalUser"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Free Fire ID</h6>
+                        <p id="withdrawalFfId"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Amount</h6>
+                        <p id="withdrawalAmount"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Status</h6>
+                        <p id="withdrawalStatus"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Date</h6>
+                        <p id="withdrawalDate"></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <div id="withdrawalActionButtons">
+                        <!-- Action buttons will be added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- View User Modal -->
+    <div class="modal fade" id="viewUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">User Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <h6>User ID</h6>
+                        <p id="userIdText"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Email</h6>
+                        <p id="userEmail"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Referral Code</h6>
+                        <p id="userRefCode"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Balance</h6>
+                        <p id="userBalance"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Total Referrals</h6>
+                        <p id="userReferrals"></p>
+                    </div>
+                    <div class="mb-3">
+                        <h6>Joined Date</h6>
+                        <p id="userJoined"></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-accent" id="editUserBalanceBtn">Edit Balance</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit User Balance Modal -->
+    <div class="modal fade" id="editBalanceModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit User Balance</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="balanceForm">
+                        <input type="hidden" id="balanceUserId">
+                        <div class="mb-3">
+                            <label for="newBalance" class="form-label">New Balance</label>
+                            <input type="number" class="form-control" id="newBalance" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-accent" id="saveBalanceBtn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-// Add Funds -> create static wallet via backend
-$('btnAdd').onclick = async ()=>{
-  const u = auth.currentUser; if(!u) return toast('لومړی ننوتل');
-  const amount = parseFloat($('amount').value||'0');
-  if(!(amount>0)) return toast('مقدار صحیح داخل کړئ');
-  $('btnAdd').disabled = true; $('btnAdd').textContent = 'در حال ایجاد...';
-  try{
-    const res = await fetch(`${FRONTEND_PROXY_BASE}/api/create-static`,{
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ userId:u.uid, amount, currency:'USDT', network:'bsc' })
-    });
-    const j = await res.json();
-    if(!res.ok) throw new Error(j.message||'Error');
-
-    // save a local pending deposit record (server also writes on webhook)
-    const dep = { id:j.id, amount, currency:'USDT', network:'bsc', address:j.address, url:j.url, status:'waiting', created:Date.now() };
-    await db.ref(`deposits/${u.uid}/${dep.id}`).set(dep);
-
-    // show UI
-    $('payAddress').textContent = j.address;
-    $('payLink').href = j.url;
-    $('depositCard').classList.remove('hidden');
-    $('qrcode').innerHTML = '';
-    new QRCode(document.getElementById('qrcode'), { text: j.address, width: 200, height: 200 });
-    toast('ادرس جوړ شو — لطفاً تادیه وکړئ');
-  } catch(e){ console.error(e); toast(e.message) }
-  finally{ $('btnAdd').disabled=false; $('btnAdd').textContent='Add'; }
-}
-
-$('btnCloseDeposit').onclick = ()=> $('depositCard').classList.add('hidden');
-$('copyAddr').onclick = ()=> { navigator.clipboard.writeText($('payAddress').textContent); toast('کاپي شو'); };
-</script><!-- ===================== BACKEND (save as server.js) ===================== --><script type="text/plain" id="serverjs">
-/**
- * Minimal Express proxy + webhook for Cryptomus (Business API)
- * SECURITY: Never expose your API key in the browser. Keep this server private.
- */
-
-import express from 'express';
-import cors from 'cors';
-import bodyParser from 'body-parser';
-import fetch from 'node-fetch';
-import md5 from 'md5';
-import admin from 'firebase-admin';
-
-// ---- Config (FILL THESE) ----
-const CRYPTOMUS_API_KEY = 'REPLACE_WITH_YOUR_CRYPTOMUS_API_KEY'; // you provided one
-const MERCHANT_UUID     = 'REPLACE_WITH_YOUR_MERCHANT_UUID';     // find in Cryptomus merchant settings
-const PORT = process.env.PORT || 3000;
-const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`; // public URL for webhook during dev use ngrok
-
-// Firebase Admin (use service account)
-// Option A: GOOGLE_APPLICATION_CREDENTIALS env var -> path to service account JSON
-// Option B: paste credential inline
-if (!admin.apps.length) {
-  try {
-    admin.initializeApp({
-      credential: admin.credential.applicationDefault(),
-      databaseURL: 'https://onlinewark-a0147-default-rtdb.firebaseio.com'
-    });
-  } catch (e) {
-    console.error('Firebase Admin init failed. Set GOOGLE_APPLICATION_CREDENTIALS or inline creds.');
-    throw e;
-  }
-}
-const rtdb = admin.database();
-
-const app = express();
-app.use(cors());
-app.use(bodyParser.json({ type: '*/*' }));
-
-// Helper: make signed POST to Cryptomus
-async function cryptomusPost(path, payload={}){
-  const body = JSON.stringify(payload);
-  const sign = md5(Buffer.from(body).toString('base64') + CRYPTOMUS_API_KEY);
-  const res = await fetch(`https://api.cryptomus.com${path}`,{
-    method:'POST', headers:{
-      'Content-Type':'application/json',
-      'merchant': MERCHANT_UUID,
-      'sign': sign
-    }, body
-  });
-  const json = await res.json();
-  if(!res.ok || json.state!==0){
-    const msg = json?.message || JSON.stringify(json);
-    throw new Error(msg);
-  }
-  return json.result;
-}
-
-// API: create static wallet for a user (USDT on BSC by default)
-app.post('/api/create-static', async (req, res)=>{
-  try{
-    const { userId, amount, currency='USDT', network='bsc' } = req.body || {};
-    if(!userId) return res.status(400).json({message:'userId required'});
-
-    // Create a unique order_id to tie static wallet to this deposit
-    const order_id = `${userId}-${Date.now()}`;
-
-    const result = await cryptomusPost('/v1/wallet', {
-      currency, network, order_id,
-      url_callback: `${BASE_URL}/api/cryptomus/webhook`
-    });
-
-    // Pre-create a pending deposit record (optional; webhook will upsert too)
-    const deposit = {
-      id: order_id,
-      userId,
-      amount: Number(amount)||0,
-      currency, network,
-      address: result.address,
-      url: result.url,
-      status: 'waiting',
-      created: Date.now()
-    };
-    await rtdb.ref(`deposits/${userId}/${order_id}`).set(deposit);
-
-    res.json({ id: order_id, address: result.address, url: result.url });
-  }catch(e){ console.error(e); res.status(400).json({message: e.message}); }
-});
-
-// OPTIONAL: If you prefer amount-locked address, use invoice creation
-// app.post('/api/create-invoice', async (req,res)=>{
-//   try{
-//     const { userId, amount, currency='USDT', network='bsc' } = req.body || {};
-//     if(!userId || !amount) return res.status(400).json({message:'userId & amount required'});
-//     const order_id = `${userId}-${Date.now()}`;
-//     const result = await cryptomusPost('/v1/payment', {
-//       amount: String(amount),
-//       currency, network, order_id,
-//       url_callback: `${BASE_URL}/api/cryptomus/webhook`
-//     });
-//     await rtdb.ref(`deposits/${userId}/${order_id}`).set({
-//       id: order_id, userId, amount:Number(amount), currency, network,
-//       address: result.address, url: result.url, status:'check', created: Date.now()
-//     });
-//     res.json({ id: order_id, address: result.address, url: result.url });
-//   }catch(e){ res.status(400).json({message:e.message}); }
-// });
-
-// Webhook: verify signature and credit balance
-app.post('/api/cryptomus/webhook', async (req, res)=>{
-  try{
-    const raw = JSON.stringify(req.body || {});
-    const headerSign = req.headers['sign'] || req.headers['signature'];
-    if(!headerSign) throw new Error('Missing sign header');
-    const expected = md5(Buffer.from(raw).toString('base64') + CRYPTOMUS_API_KEY);
-    if(expected !== headerSign) throw new Error('Invalid signature');
-
-    const data = req.body;
-    // Static wallet webhook contains order_id, amount, currency, network, status, txid, address
-    const { order_id, currency, network, amount, status, address } = data;
-
-    // Extract userId from our composed order_id
-    const [userId] = String(order_id||'').split('-');
-    if(!userId) throw new Error('No userId in order_id');
-
-    // Update deposit record
-    const depRef = rtdb.ref(`deposits/${userId}/${order_id}`);
-    await depRef.update({
-      status, currency, network, address, txid: data.txid || null,
-      payment_amount: Number(amount)||0,
-      updated: Date.now()
-    });
-
-    // If paid or paid_over -> credit balance
-    if(status==='paid' || status==='paid_over'){
-      await rtdb.ref(`users/${userId}/balance`).transaction((bal)=>{
-        const cur = Number(bal)||0; return cur + (Number(amount)||0);
-      });
-    }
-
-    res.json({ok:true});
-  } catch(e){ console.error('Webhook error:', e.message); res.status(400).json({ok:false, message:e.message}); }
-});
-
-app.get('/', (_,res)=>res.send('Cryptomus proxy running'));
-
-app.listen(PORT, ()=> console.log(`Server listening on ${PORT}. Webhook: ${BASE_URL}/api/cryptomus/webhook`));
-</script></body>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyD4UbW_Iy4kUWH3V70Q1mWCI4-_KFk6ku4",
+            authDomain: "onlinewark-a0147.firebaseapp.com",
+            databaseURL: "https://onlinewark-a0147-default-rtdb.firebaseio.com",
+            projectId: "onlinewark-a0147",
+            storageBucket: "onlinewark-a0147.appspot.com",
+            messagingSenderId: "92155538620",
+            appId: "1:92155538620:android:5e198a8eea6bf17f61f4b9"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+        
+        // Admin credentials (in a real app, this should be handled with proper authentication)
+        const ADMIN_EMAIL = "admin@afghanshop.com";
+        const ADMIN_PASSWORD = "admin123";
+        
+        // Current date
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        // Login as admin
+        auth.signInWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD)
+            .then(() => {
+                loadDashboardStats();
+                loadDiamonds();
+                loadUC();
+                loadAccounts();
+                loadWithdrawals();
+                loadOrders();
+                loadUsers();
+                loadNotifications();
+            })
+            .catch((error) => {
+                console.error("Admin login error:", error);
+                alert("Failed to login as admin. Please check console for details.");
+            });
+        
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            auth.signOut()
+                .then(() => {
+                    window.location.href = 'index.html';
+                });
+        });
+        
+        // Navigation
+        document.querySelectorAll('[data-section]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const sectionId = this.getAttribute('data-section') + '-section';
+                
+                // Hide all sections
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                
+                // Show selected section
+                document.getElementById(sectionId).style.display = 'block';
+                
+                // Update active nav link
+                document.querySelectorAll('.sidebar .nav-link').forEach(navLink => {
+                    navLink.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+        
+        // Filter buttons
+        document.querySelectorAll('[data-filter]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const filter = this.getAttribute('data-filter');
+                
+                // Update active button
+                this.parentElement.querySelectorAll('.btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                // Filter content
+                if (this.closest('#withdrawals-section')) {
+                    filterWithdrawals(filter);
+                } else if (this.closest('#orders-section')) {
+                    filterOrders(filter);
+                }
+            });
+        });
+        
+        // Load dashboard statistics
+        function loadDashboardStats() {
+            // Total users
+            database.ref('users').once('value')
+                .then(snapshot => {
+                    document.getElementById('totalUsers').textContent = snapshot.numChildren();
+                });
+            
+            // Total orders
+            database.ref('orders').once('value')
+                .then(snapshot => {
+                    document.getElementById('totalOrders').textContent = snapshot.numChildren();
+                });
+            
+            // Pending withdrawals
+            database.ref('withdrawals').orderByChild('status').equalTo('pending').once('value')
+                .then(snapshot => {
+                    document.getElementById('pendingWithdrawals').textContent = snapshot.numChildren();
+                });
+            
+            // Total revenue (sum of all completed orders)
+            database.ref('orders').orderByChild('status').equalTo('completed').once('value')
+                .then(snapshot => {
+                    let total = 0;
+                    snapshot.forEach(order => {
+                        total += parseFloat(order.val().priceUsd);
+                    });
+                    document.getElementById('totalRevenue').textContent = '$' + total.toFixed(2);
+                });
+            
+            // Recent orders
+            database.ref('orders').limitToLast(5).once('value')
+                .then(snapshot => {
+                    const ordersTable = document.getElementById('recentOrders');
+                    ordersTable.innerHTML = '';
+                    
+                    snapshot.forEach(order => {
+                        const orderData = order.val();
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${order.key.substr(0, 6)}...</td>
+                            <td>${orderData.type === 'diamonds' ? 'Diamonds' : 'UC'}</td>
+                            <td>${orderData.amount}</td>
+                            <td><span class="badge ${getStatusBadgeClass(orderData.status)}">${orderData.status}</span></td>
+                        `;
+                        row.addEventListener('click', () => viewOrder(order.key, orderData));
+                        ordersTable.appendChild(row);
+                    });
+                });
+            
+            // Pending withdrawals list
+            database.ref('withdrawals').orderByChild('status').equalTo('pending').limitToLast(5).once('value')
+                .then(snapshot => {
+                    const withdrawalsTable = document.getElementById('pendingWithdrawalsList');
+                    withdrawalsTable.innerHTML = '';
+                    
+                    snapshot.forEach(withdrawal => {
+                        const withdrawalData = withdrawal.val();
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${withdrawalData.email}</td>
+                            <td>${withdrawalData.ffId}</td>
+                            <td>${withdrawalData.amount} diamonds</td>
+                            <td>
+                                <button class="btn btn-sm btn-success me-1" onclick="processWithdrawal('${withdrawal.key}', 'completed', event)">Complete</button>
+                                <button class="btn btn-sm btn-danger" onclick="processWithdrawal('${withdrawal.key}', 'cancelled', event)">Cancel</button>
+                            </td>
+                        `;
+                        withdrawalsTable.appendChild(row);
+                    });
+                });
+        }
+        
+        // Get badge class based on status
+        function getStatusBadgeClass(status) {
+            switch(status) {
+                case 'pending': return 'badge-pending';
+                case 'completed': return 'badge-completed';
+                case 'cancelled': return 'badge-cancelled';
+                default: return 'badge-secondary';
+            }
+        }
+        
+        // Load diamonds packages
+        function loadDiamonds() {
+            database.ref('diamonds').once('value')
+                .then(snapshot => {
+                    const diamondsTable = document.getElementById('diamondsTable');
+                    diamondsTable.innerHTML = '';
+                    
+                    if (!snapshot.exists()) {
+                        diamondsTable.innerHTML = '<tr><td colspan="5" class="text-center">No diamond packages found</td></tr>';
+                        return;
+                    }
+                    
+                    snapshot.forEach(package => {
+                        const packageData = package.val();
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${package.key.substr(0, 6)}...</td>
+                            <td>${packageData.amount}</td>
+                            <td>$${packageData.priceUsd}</td>
+                            <td>${packageData.priceAfn} AFN</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary me-1" onclick="editPackage('diamonds', '${package.key}', ${packageData.amount}, ${packageData.priceUsd}, ${packageData.priceAfn})">Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick="deletePackage('diamonds', '${package.key}')">Delete</button>
+                            </td>
+                        `;
+                        diamondsTable.appendChild(row);
+                    });
+                });
+        }
+        
+        // Load UC packages
+        function loadUC() {
+            database.ref('uc').once('value')
+                .then(snapshot => {
+                    const ucTable = document.getElementById('ucTable');
+                    ucTable.innerHTML = '';
+                    
+                    if (!snapshot.exists()) {
+                        ucTable.innerHTML = '<tr><td colspan="5" class="text-center">No UC packages found</td></tr>';
+                        return;
+                    }
+                    
+                    snapshot.forEach(package => {
+                        const packageData = package.val();
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${package.key.substr(0, 6)}...</td>
+                            <td>${packageData.amount}</td>
+                            <td>$${packageData.priceUsd}</td>
+                            <td>${packageData.priceAfn} AFN</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary me-1" onclick="editPackage('uc', '${package.key}', ${packageData.amount}, ${packageData.priceUsd}, ${packageData.priceAfn})">Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick="deletePackage('uc', '${package.key}')">Delete</button>
+                            </td>
+                        `;
+                        ucTable.appendChild(row);
+                    });
+                });
+        }
+        
+        // Load game accounts
+        function loadAccounts() {
+            // Free Fire accounts
+            database.ref('items').orderByChild('game').equalTo('freefire').once('value')
+                .then(snapshot => {
+                    const freefireTable = document.getElementById('freefireTable');
+                    freefireTable.innerHTML = '';
+                    
+                    if (!snapshot.exists()) {
+                        freefireTable.innerHTML = '<tr><td colspan="6" class="text-center">No Free Fire accounts found</td></tr>';
+                        return;
+                    }
+                    
+                    snapshot.forEach(account => {
+                        const accountData = account.val();
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${account.key.substr(0, 6)}...</td>
+                            <td>${accountData.name}</td>
+                            <td>${accountData.level}</td>
+                            <td>$${accountData.priceUsd}</td>
+                            <td>${accountData.priceAfn} AFN</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary me-1" onclick="editAccount('${account.key}', '${accountData.name}', ${accountData.level}, ${accountData.priceUsd}, ${accountData.priceAfn}, '${accountData.description}', ${JSON.stringify(accountData.images || [])})">Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteAccount('${account.key}')">Delete</button>
+                            </td>
+                        `;
+                        freefireTable.appendChild(row);
+                    });
+                });
+            
+            // PUBG accounts
+            database.ref('items').orderByChild('game').equalTo('pubg').once('value')
+                .then(snapshot => {
+                    const pubgTable = document.getElementById('pubgTable');
+                    pubgTable.innerHTML = '';
+                    
+                    if (!snapshot.exists()) {
+                        pubgTable.innerHTML = '<tr><td colspan="6" class="text-center">No PUBG accounts found</td></tr>';
+                        return;
+                    }
+                    
+                    snapshot.forEach(account => {
+                        const accountData = account.val();
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${account.key.substr(0, 6)}...</td>
+                            <td>${accountData.name}</td>
+                            <td>${accountData.level}</td>
+                            <td>$${accountData.priceUsd}</td>
+                            <td>${accountData.priceAfn} AFN</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary me-1" onclick="editAccount('${account.key}', '${accountData.name}', ${accountData.level}, ${accountData.priceUsd}, ${accountData.priceAfn}, '${accountData.description}', ${JSON.stringify(accountData.images || [])})">Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteAccount('${account.key}')">Delete</button>
+                            </td>
+                        `;
+                        pubgTable.appendChild(row);
+                    });
+                });
+        }
+        
+        // Load withdrawals
+        function loadWithdrawals() {
+            database.ref('withdrawals').once('value')
+                .then(snapshot => {
+                    const withdrawalsTable = document.getElementById('withdrawalsTable');
+                    withdrawalsTable.innerHTML = '';
+                    
+                    if (!snapshot.exists()) {
+                        withdrawalsTable.innerHTML = '<tr><td colspan="7" class="text-center">No withdrawals found</td></tr>';
+                        return;
+                    }
+                    
+                    snapshot.forEach(withdrawal => {
+                        const withdrawalData = withdrawal.val();
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${withdrawal.key.substr(0, 6)}...</td>
+                            <td>${withdrawalData.email}</td>
+                            <td>${withdrawalData.ffId}</td>
+                            <td>${withdrawalData.amount} diamonds</td>
+                            <td><span class="badge ${getStatusBadgeClass(withdrawalData.status)}">${withdrawalData.status}</span></td>
+                            <td>${new Date(withdrawalData.timestamp).toLocaleDateString()}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" onclick="viewWithdrawal('${withdrawal.key}')">View</button>
+                            </td>
+                        `;
+                        withdrawalsTable.appendChild(row);
+                    });
+                });
+        }
+        
+        // Filter withdrawals
+        function filterWithdrawals(filter) {
+            let query;
+            
+            if (filter === 'all') {
+                query = database.ref('withdrawals');
+            } else {
+                query = database.ref('withdrawals').orderByChild('status').equalTo(filter);
+            }
+            
+            query.once('value')
+                .then(snapshot => {
+                    const withdrawalsTable = document.getElementById('withdrawalsTable');
+                    withdrawalsTable.innerHTML = '';
+                    
+                    if (!snapshot.exists()) {
+                        withdrawalsTable.innerHTML = '<tr><td colspan="7" class="text-center">No withdrawals found</td></tr>';
+                        return;
+                    }
+                    
+                    snapshot.forEach(withdrawal => {
+                        const withdrawalData = withdrawal.val();
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${withdrawal.key.substr(0, 6)}...</td>
+                            <td>${withdrawalData.email}</td>
+                            <td>${withdrawalData.ffId}</td>
+                            <td>${withdrawalData.amount} diamonds</td>
+                            <td><span class="badge ${getStatusBadgeClass(withdrawalData.status)}">${withdrawalData.status}</span></td>
+                            <td>${new Date(withdrawalData.timestamp).toLocaleDateString()}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" onclick="viewWithdrawal('${withdrawal.key}')">View</button>
+                            </td>
+                        `;
+                        withdrawalsTable.appendChild(row);
+                    });
+                });
+        }
+        
+        // Load orders
+        function loadOrders() {
+            database.ref('orders').once('value')
+                .then(snapshot => {
+                    const ordersTable = document.getElementById('ordersTable');
+                    ordersTable.innerHTML = '';
+                    
+                    if (!snapshot.exists()) {
+                        ordersTable.innerHTML = '<tr><td colspan="8" class="text-center">No orders found</td></tr>';
+                        return;
+                    }
+                    
+                    snapshot.forEach(order => {
+                        const orderData = order.val();
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${order.key.substr(0, 6)}...</td>
+                            <td>${orderData.email}</td>
+                            <td>${orderData.type === 'diamonds' ? 'Diamonds' : 'UC'}</td>
+                            <td>${orderData.amount}</td>
+                            <td>$${orderData.priceUsd} / ${orderData.priceAfn} AFN</td>
+                            <td><span class="badge ${getStatusBadgeClass(orderData.status)}">${orderData.status}</span></td>
+                            <td>${new Date(orderData.timestamp).toLocaleDateString()}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" onclick="viewOrder('${order.key}')">View</button>
+                            </td>
+                        `;
+                        ordersTable.appendChild(row);
+                    });
+                });
+        }
+        
+        // Filter orders
+        function filterOrders(filter) {
+            let query;
+            
+            if (filter === 'all') {
+                query = database.ref('orders');
+            } else {
+                query = database.ref('orders').orderByChild('status').equalTo(filter);
+            }
+            
+            query.once('value')
+                .then(snapshot => {
+                    const ordersTable = document.getElementById('ordersTable');
+                    ordersTable.innerHTML = '';
+                    
+                    if (!snapshot.exists()) {
+                        ordersTable.innerHTML = '<tr><td colspan="8" class="text-center">No orders found</td></tr>';
+                        return;
+                    }
+                    
+                    snapshot.forEach(order => {
+                        const orderData = order.val();
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${order.key.substr(0, 6)}...</td>
+                            <td>${orderData.email}</td>
+                            <td>${orderData.type === 'diamonds' ? 'Diamonds' : 'UC'}</td>
+                            <td>${orderData.amount}</td>
+                            <td>$${orderData.priceUsd} / ${orderData.priceAfn} AFN</td>
+                            <td><span class="badge ${getStatusBadgeClass(orderData.status)}">${orderData.status}</span></td>
+                            <td>${new Date(orderData.timestamp).toLocaleDateString()}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" onclick="viewOrder('${order.key}')">View</button>
+                            </td>
+                        `;
+                        ordersTable.appendChild(row);
+                    });
+                });
+        }
+        
+        // Load users
+        function loadUsers() {
+            database.ref('users').once('value')
+                .then(snapshot => {
+                    const usersTable = document.getElementById('usersTable');
+                    usersTable.innerHTML = '';
+                    
+                    // Also populate user select for notifications
+                    const userSelect = document.getElementById('notificationUser');
+                    userSelect.innerHTML = '<option value="">Select user</option>';
+                    
+                    if (!snapshot.exists()) {
+                        usersTable.innerHTML = '<tr><td colspan="6" class="text-center">No users found</td></tr>';
+                        return;
+                    }
+                    
+                    snapshot.forEach(user => {
+                        const userData = user.val();
+                        const referrals = userData.referrals ? Object.keys(userData.referrals).length : 0;
+                        
+                        // Add to users table
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${user.key.substr(0, 6)}...</td>
+                            <td>${userData.email}</td>
+                            <td>${referrals}</td>
+                            <td>${userData.balance || 0} diamonds</td>
+                            <td>${new Date(userData.createdAt).toLocaleDateString()}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" onclick="viewUser('${user.key}')">View</button>
+                            </td>
+                        `;
+                        usersTable.appendChild(row);
+                        
+                        // Add to user select dropdown
+                        const option = document.createElement('option');
+                        option.value = user.key;
+                        option.textContent = `${userData.email} (${user.key.substr(0, 6)}...)`;
+                        userSelect.appendChild(option);
+                    });
+                });
+        }
+        
+        // Load notifications
+        function loadNotifications() {
+            database.ref('notifications').limitToLast(10).once('value')
+                .then(snapshot => {
+                    const notificationsTable = document.getElementById('notificationsTable');
+                    notificationsTable.innerHTML = '';
+                    
+                    if (!snapshot.exists()) {
+                        notificationsTable.innerHTML = '<tr><td colspan="4" class="text-center">No notifications found</td></tr>';
+                        return;
+                    }
+                    
+                    snapshot.forEach(notification => {
+                        const notificationData = notification.val();
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${notificationData.title}</td>
+                            <td>${notificationData.message}</td>
+                            <td>${notificationData.target === 'all' ? 'All Users' : 'Specific User'}</td>
+                            <td>${new Date(notificationData.timestamp).toLocaleDateString()}</td>
+                        `;
+                        notificationsTable.appendChild(row);
+                    });
+                });
+        }
+        
+        // Notification target radio buttons
+        document.querySelectorAll('input[name="notificationTarget"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.getElementById('userSelectContainer').style.display = 
+                    this.value === 'specific' ? 'block' : 'none';
+            });
+        });
+        
+        // Send notification
+        document.getElementById('notificationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('notificationTitle').value;
+            const message = document.getElementById('notificationMessage').value;
+            const target = document.querySelector('input[name="notificationTarget"]:checked').value;
+            const userId = target === 'specific' ? document.getElementById('notificationUser').value : null;
+            
+            if (target === 'specific' && !userId) {
+                alert('Please select a user');
+                return;
+            }
+            
+            const notification = {
+                title: title,
+                message: message,
+                target: target,
+                userId: userId,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+            
+            database.ref('notifications').push(notification)
+                .then(() => {
+                    alert('Notification sent successfully');
+                    document.getElementById('notificationForm').reset();
+                    document.getElementById('userSelectContainer').style.display = 'none';
+                    document.getElementById('allUsers').checked = true;
+                    loadNotifications();
+                })
+                .catch(error => {
+                    console.error('Error sending notification:', error);
+                    alert('Failed to send notification');
+                });
+        });
+        
+        // Save new package
+        document.getElementById('savePackageBtn').addEventListener('click', function() {
+            const type = document.getElementById('packageType').value;
+            const amount = document.getElementById('packageAmount').value;
+            const priceUsd = document.getElementById('packagePriceUsd').value;
+            const priceAfn = document.getElementById('packagePriceAfn').value;
+            
+            if (!amount || !priceUsd || !priceAfn) {
+                alert('Please fill all fields');
+                return;
+            }
+            
+            const packageData = {
+                amount: parseInt(amount),
+                priceUsd: parseFloat(priceUsd),
+                priceAfn: parseInt(priceAfn)
+            };
+            
+            const dbRef = type === 'diamonds' ? database.ref('diamonds') : database.ref('uc');
+            
+            dbRef.push(packageData)
+                .then(() => {
+                    alert('Package added successfully');
+                    document.getElementById('packageForm').reset();
+                    bootstrap.Modal.getInstance(document.getElementById('addPackageModal')).hide();
+                    
+                    if (type === 'diamonds') {
+                        loadDiamonds();
+                    } else {
+                        loadUC();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error adding package:', error);
+                    alert('Failed to add package');
+                });
+        });
+        
+        // Save new account
+        document.getElementById('saveAccountBtn').addEventListener('click', function() {
+            const game = document.getElementById('accountGame').value;
+            const name = document.getElementById('accountName').value;
+            const level = document.getElementById('accountLevel').value;
+            const priceUsd = document.getElementById('accountPriceUsd').value;
+            const priceAfn = document.getElementById('accountPriceAfn').value;
+            const description = document.getElementById('accountDescription').value;
+            
+            if (!name || !level || !priceUsd || !priceAfn) {
+                alert('Please fill all required fields');
+                return;
+            }
+            
+            // In a real app, you would upload images to Firebase Storage
+            // For this example, we'll just use placeholder URLs
+            const images = [
+                'https://via.placeholder.com/300',
+                'https://via.placeholder.com/300',
+                'https://via.placeholder.com/300',
+                'https://via.placeholder.com/300'
+            ];
+            
+            const accountData = {
+                game: game,
+                name: name,
+                level: parseInt(level),
+                priceUsd: parseFloat(priceUsd),
+                priceAfn: parseInt(priceAfn),
+                description: description,
+                images: images
+            };
+            
+            database.ref('items').push(accountData)
+                .then(() => {
+                    alert('Account added successfully');
+                    document.getElementById('accountForm').reset();
+                    document.getElementById('imagePreviews').innerHTML = '';
+                    bootstrap.Modal.getInstance(document.getElementById('addAccountModal')).hide();
+                    loadAccounts();
+                })
+                .catch(error => {
+                    console.error('Error adding account:', error);
+                    alert('Failed to add account');
+                });
+        });
+        
+        // Image preview for new account
+        document.getElementById('accountImages').addEventListener('change', function(e) {
+            const files = e.target.files;
+            const previewContainer = document.getElementById('imagePreviews');
+            previewContainer.innerHTML = '';
+            
+            for (let i = 0; i < Math.min(files.length, 4); i++) {
+                const file = files[i];
+                if (!file.type.match('image.*')) continue;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'image-preview';
+                    previewContainer.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Image preview for edit account
+        document.getElementById('editAccountImages').addEventListener('change', function(e) {
+            const files = e.target.files;
+            const previewContainer = document.getElementById('editImagePreviews');
+            previewContainer.innerHTML = '';
+            
+            for (let i = 0; i < Math.min(files.length, 4); i++) {
+                const file = files[i];
+                if (!file.type.match('image.*')) continue;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'image-preview';
+                    previewContainer.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // View order details
+        function viewOrder(orderId, orderData = null) {
+            if (!orderData) {
+                database.ref('orders/' + orderId).once('value')
+                    .then(snapshot => {
+                        viewOrder(orderId, snapshot.val());
+                    });
+                return;
+            }
+            
+            document.getElementById('orderIdText').textContent = orderId;
+            document.getElementById('orderUser').textContent = orderData.email;
+            document.getElementById('orderType').textContent = orderData.type === 'diamonds' ? 'Free Fire Diamonds' : 'PUBG UC';
+            document.getElementById('orderAmount').textContent = orderData.amount;
+            document.getElementById('orderPrice').textContent = `$${orderData.priceUsd} / ${orderData.priceAfn} AFN`;
+            document.getElementById('orderStatus').textContent = orderData.status;
+            document.getElementById('orderDate').textContent = new Date(orderData.timestamp).toLocaleString();
+            
+            const actionButtons = document.getElementById('orderActionButtons');
+            actionButtons.innerHTML = '';
+            
+            if (orderData.status === 'pending') {
+                const completeBtn = document.createElement('button');
+                completeBtn.className = 'btn btn-success me-2';
+                completeBtn.textContent = 'Mark as Completed';
+                completeBtn.addEventListener('click', () => updateOrderStatus(orderId, 'completed'));
+                actionButtons.appendChild(completeBtn);
+                
+                const cancelBtn = document.createElement('button');
+                cancelBtn.className = 'btn btn-danger';
+                cancelBtn.textContent = 'Cancel Order';
+                cancelBtn.addEventListener('click', () => updateOrderStatus(orderId, 'cancelled'));
+                actionButtons.appendChild(cancelBtn);
+            } else if (orderData.status === 'completed') {
+                const statusText = document.createElement('span');
+                statusText.className = 'text-success me-2';
+                statusText.textContent = 'Order completed';
+                actionButtons.appendChild(statusText);
+            } else {
+                const statusText = document.createElement('span');
+                statusText.className = 'text-danger';
+                statusText.textContent = 'Order cancelled';
+                actionButtons.appendChild(statusText);
+            }
+            
+            bootstrap.Modal.getInstance(document.getElementById('viewOrderModal') || 
+            new bootstrap.Modal(document.getElementById('viewOrderModal')).show();
+        }
+        
+        // Update order status
+        function updateOrderStatus(orderId, status) {
+            database.ref('orders/' + orderId + '/status').set(status)
+                .then(() => {
+                    alert('Order status updated successfully');
+                    bootstrap.Modal.getInstance(document.getElementById('viewOrderModal')).hide();
+                    loadOrders();
+                    loadDashboardStats();
+                })
+                .catch(error => {
+                    console.error('Error updating order status:', error);
+                    alert('Failed to update order status');
+                });
+        }
+        
+        // View withdrawal details
+        function viewWithdrawal(withdrawalId) {
+            database.ref('withdrawals/' + withdrawalId).once('value')
+                .then(snapshot => {
+                    const withdrawalData = snapshot.val();
+                    
+                    document.getElementById('withdrawalIdText').textContent = withdrawalId;
+                    document.getElementById('withdrawalUser').textContent = withdrawalData.email;
+                    document.getElementById('withdrawalFfId').textContent = withdrawalData.ffId;
+                    document.getElementById('withdrawalAmount').textContent = withdrawalData.amount + ' diamonds';
+                    document.getElementById('withdrawalStatus').textContent = withdrawalData.status;
+                    document.getElementById('withdrawalDate').textContent = new Date(withdrawalData.timestamp).toLocaleString();
+                    
+                    const actionButtons = document.getElementById('withdrawalActionButtons');
+                    actionButtons.innerHTML = '';
+                    
+                    if (withdrawalData.status === 'pending') {
+                        const completeBtn = document.createElement('button');
+                        completeBtn.className = 'btn btn-success me-2';
+                        completeBtn.textContent = 'Mark as Completed';
+                        completeBtn.addEventListener('click', () => processWithdrawal(withdrawalId, 'completed'));
+                        actionButtons.appendChild(completeBtn);
+                        
+                        const cancelBtn = document.createElement('button');
+                        cancelBtn.className = 'btn btn-danger';
+                        cancelBtn.textContent = 'Cancel Withdrawal';
+                        cancelBtn.addEventListener('click', () => processWithdrawal(withdrawalId, 'cancelled'));
+                        actionButtons.appendChild(cancelBtn);
+                    } else if (withdrawalData.status === 'completed') {
+                        const statusText = document.createElement('span');
+                        statusText.className = 'text-success me-2';
+                        statusText.textContent = 'Withdrawal completed';
+                        actionButtons.appendChild(statusText);
+                    } else {
+                        const statusText = document.createElement('span');
+                        statusText.className = 'text-danger';
+                        statusText.textContent = 'Withdrawal cancelled';
+                        actionButtons.appendChild(statusText);
+                    }
+                    
+                    bootstrap.Modal.getInstance(document.getElementById('viewWithdrawalModal') || 
+                    new bootstrap.Modal(document.getElementById('viewWithdrawalModal'))).show();
+                });
+        }
+        
+        // Process withdrawal
+        function processWithdrawal(withdrawalId, status, event = null) {
+            if (event) event.stopPropagation();
+            
+            database.ref('withdrawals/' + withdrawalId + '/status').set(status)
+                .then(() => {
+                    alert('Withdrawal status updated successfully');
+                    if (!event) {
+                        bootstrap.Modal.getInstance(document.getElementById('viewWithdrawalModal')).hide();
+                    }
+                    loadWithdrawals();
+                    loadDashboardStats();
+                })
+                .catch(error => {
+                    console.error('Error updating withdrawal status:', error);
+                    alert('Failed to update withdrawal status');
+                });
+        }
+        
+        // View user details
+        function viewUser(userId) {
+            database.ref('users/' + userId).once('value')
+                .then(snapshot => {
+                    const userData = snapshot.val();
+                    
+                    document.getElementById('userIdText').textContent = userId;
+                    document.getElementById('userEmail').textContent = userData.email;
+                    document.getElementById('userRefCode').textContent = userData.referralCode || 'N/A';
+                    document.getElementById('userBalance').textContent = (userData.balance || 0) + ' diamonds';
+                    
+                    const referrals = userData.referrals ? Object.keys(userData.referrals).length : 0;
+                    document.getElementById('userReferrals').textContent = referrals;
+                    
+                    document.getElementById('userJoined').textContent = new Date(userData.createdAt).toLocaleString();
+                    
+                    // Store user ID for balance editing
+                    document.getElementById('balanceUserId').value = userId;
+                    document.getElementById('newBalance').value = userData.balance || 0;
+                    
+                    bootstrap.Modal.getInstance(document.getElementById('viewUserModal') || 
+                    new bootstrap.Modal(document.getElementById('viewUserModal'))).show();
+                });
+        }
+        
+        // Edit user balance
+        document.getElementById('editUserBalanceBtn').addEventListener('click', function() {
+            bootstrap.Modal.getInstance(document.getElementById('viewUserModal')).hide();
+            bootstrap.Modal.getInstance(document.getElementById('editBalanceModal') || 
+            new bootstrap.Modal(document.getElementById('editBalanceModal'))).show();
+        });
+        
+        // Save user balance
+        document.getElementById('saveBalanceBtn').addEventListener('click', function() {
+            const userId = document.getElementById('balanceUserId').value;
+            const newBalance = parseInt(document.getElementById('newBalance').value);
+            
+            if (isNaN(newBalance)) {
+                alert('Please enter a valid number');
+                return;
+            }
+            
+            database.ref('users/' + userId + '/balance').set(newBalance)
+                .then(() => {
+                    alert('User balance updated successfully');
+                    bootstrap.Modal.getInstance(document.getElementById('editBalanceModal')).hide();
+                    loadUsers();
+                })
+                .catch(error => {
+                    console.error('Error updating user balance:', error);
+                    alert('Failed to update user balance');
+                });
+        });
+        
+        // Edit package
+        function editPackage(db, packageId, amount, priceUsd, priceAfn) {
+            document.getElementById('editPackageId').value = packageId;
+            document.getElementById('editPackageDb').value = db;
+            document.getElementById('editPackageAmount').value = amount;
+            document.getElementById('editPackagePriceUsd').value = priceUsd;
+            document.getElementById('editPackagePriceAfn').value = priceAfn;
+            
+            bootstrap.Modal.getInstance(document.getElementById('editPackageModal') || 
+            new bootstrap.Modal(document.getElementById('editPackageModal'))).show();
+        }
+        
+        // Update package
+        document.getElementById('updatePackageBtn').addEventListener('click', function() {
+            const packageId = document.getElementById('editPackageId').value;
+            const db = document.getElementById('editPackageDb').value;
+            const amount = document.getElementById('editPackageAmount').value;
+            const priceUsd = document.getElementById('editPackagePriceUsd').value;
+            const priceAfn = document.getElementById('editPackagePriceAfn').value;
+            
+            if (!amount || !priceUsd || !priceAfn) {
+                alert('Please fill all fields');
+                return;
+            }
+            
+            const updates = {
+                amount: parseInt(amount),
+                priceUsd: parseFloat(priceUsd),
+                priceAfn: parseInt(priceAfn)
+            };
+            
+            database.ref(db + '/' + packageId).update(updates)
+                .then(() => {
+                    alert('Package updated successfully');
+                    bootstrap.Modal.getInstance(document.getElementById('editPackageModal')).hide();
+                    
+                    if (db === 'diamonds') {
+                        loadDiamonds();
+                    } else {
+                        loadUC();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating package:', error);
+                    alert('Failed to update package');
+                });
+        });
+        
+        // Delete package
+        function deletePackage(db, packageId) {
+            if (!confirm('Are you sure you want to delete this package?')) return;
+            
+            database.ref(db + '/' + packageId).remove()
+                .then(() => {
+                    alert('Package deleted successfully');
+                    
+                    if (db === 'diamonds') {
+                        loadDiamonds();
+                    } else {
+                        loadUC();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting package:', error);
+                    alert('Failed to delete package');
+                });
+        }
+        
+        // Edit account
+        function editAccount(accountId, name, level, priceUsd, priceAfn, description, images) {
+            document.getElementById('editAccountId').value = accountId;
+            document.getElementById('editAccountName').value = name;
+            document.getElementById('editAccountLevel').value = level;
+            document.getElementById('editAccountPriceUsd').value = priceUsd;
+            document.getElementById('editAccountPriceAfn').value = priceAfn;
+            document.getElementById('editAccountDescription').value = description || '';
+            
+            // Display current images
+            const currentImagesContainer = document.getElementById('currentImages');
+            currentImagesContainer.innerHTML = '';
+            
+            if (images && images.length > 0) {
+                images.forEach(img => {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = img;
+                    imgElement.className = 'image-preview';
+                    currentImagesContainer.appendChild(imgElement);
+                });
+            } else {
+                currentImagesContainer.innerHTML = '<p>No images available</p>';
+            }
+            
+            bootstrap.Modal.getInstance(document.getElementById('editAccountModal') || 
+            new bootstrap.Modal(document.getElementById('editAccountModal'))).show();
+        }
+        
+        // Update account
+        document.getElementById('updateAccountBtn').addEventListener('click', function() {
+            const accountId = document.getElementById('editAccountId').value;
+            const name = document.getElementById('editAccountName').value;
+            const level = document.getElementById('editAccountLevel').value;
+            const priceUsd = document.getElementById('editAccountPriceUsd').value;
+            const priceAfn = document.getElementById('editAccountPriceAfn').value;
+            const description = document.getElementById('editAccountDescription').value;
+            
+            if (!name || !level || !priceUsd || !priceAfn) {
+                alert('Please fill all required fields');
+                return;
+            }
+            
+            const updates = {
+                name: name,
+                level: parseInt(level),
+                priceUsd: parseFloat(priceUsd),
+                priceAfn: parseInt(priceAfn),
+                description: description
+            };
+            
+            // In a real app, you would handle image uploads here
+            // For this example, we'll just update the other fields
+            
+            database.ref('items/' + accountId).update(updates)
+                .then(() => {
+                    alert('Account updated successfully');
+                    bootstrap.Modal.getInstance(document.getElementById('editAccountModal')).hide();
+                    loadAccounts();
+                })
+                .catch(error => {
+                    console.error('Error updating account:', error);
+                    alert('Failed to update account');
+                });
+        });
+        
+        // Delete account
+        function deleteAccount(accountId) {
+            if (!confirm('Are you sure you want to delete this account?')) return;
+            
+            database.ref('items/' + accountId).remove()
+                .then(() => {
+                    alert('Account deleted successfully');
+                    loadAccounts();
+                })
+                .catch(error => {
+                    console.error('Error deleting account:', error);
+                    alert('Failed to delete account');
+                });
+        }
+        
+        // Make functions available globally
+        window.editPackage = editPackage;
+        window.deletePackage = deletePackage;
+        window.editAccount = editAccount;
+        window.deleteAccount = deleteAccount;
+        window.viewOrder = viewOrder;
+        window.viewWithdrawal = viewWithdrawal;
+        window.processWithdrawal = processWithdrawal;
+        window.viewUser = viewUser;
+    </script>
+</body>
 </html> 

@@ -1,905 +1,685 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ps">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Afghan Shop - Admin Panel</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Free Fire Afghan - اډمین پینل</title>
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
-            --primary-color: #343a40;
-            --secondary-color: #6c757d;
-            --accent-color: #ff6b00;
-            --light-color: #f8f9fa;
-            --dark-color: #212529;
+            --primary: #FF5722;
+            --secondary: #FF9800;
+            --dark: #212121;
+            --light: #f5f5f5;
+            --danger: #F44336;
+            --success: #4CAF50;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Almarai', sans-serif;
+            direction: rtl;
         }
         
         body {
             background-color: #f5f5f5;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
         }
         
         .sidebar {
-            background-color: var(--primary-color);
+            width: 250px;
+            background-color: var(--dark);
             color: white;
-            height: 100vh;
+            padding: 20px 0;
             position: fixed;
-            padding-top: 20px;
+            height: 100%;
+            transition: all 0.3s;
         }
         
-        .sidebar .nav-link {
-            color: rgba(255, 255, 255, 0.8);
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-title {
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+        
+        .sidebar-title i {
+            margin-left: 10px;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            margin-top: 20px;
+        }
+        
+        .sidebar-menu li {
             margin-bottom: 5px;
-            border-radius: 5px;
-            padding: 10px 15px;
         }
         
-        .sidebar .nav-link:hover {
+        .sidebar-menu a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu a:hover, .sidebar-menu a.active {
             background-color: rgba(255, 255, 255, 0.1);
-            color: white;
+            border-right: 3px solid var(--primary);
         }
         
-        .sidebar .nav-link.active {
-            background-color: var(--accent-color);
-            color: white;
-        }
-        
-        .sidebar .nav-link i {
-            margin-right: 10px;
+        .sidebar-menu i {
+            margin-left: 10px;
             width: 20px;
             text-align: center;
         }
         
         .main-content {
-            margin-left: 250px;
+            flex: 1;
+            margin-right: 250px;
+            transition: all 0.3s;
+        }
+        
+        .top-nav {
+            background-color: white;
+            padding: 15px 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background-color: var(--light);
+            border-radius: 20px;
+            padding: 8px 15px;
+            width: 300px;
+        }
+        
+        .search-bar input {
+            border: none;
+            background: transparent;
+            width: 100%;
+            padding: 5px;
+            outline: none;
+        }
+        
+        .search-bar i {
+            color: #777;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+        
+        .content-area {
             padding: 20px;
         }
         
+        .page-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+        }
+        
+        .page-title i {
+            margin-left: 10px;
+        }
+        
         .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
             margin-bottom: 20px;
         }
         
-        .card-header {
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .add-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .add-btn:hover {
+            background-color: var(--secondary);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        table th, table td {
+            padding: 12px 15px;
+            text-align: right;
+            border-bottom: 1px solid #eee;
+        }
+        
+        table th {
+            background-color: #f9f9f9;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        
+        table tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .status-active {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--success);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        
+        .status-inactive {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: var(--danger);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        
+        .action-btn {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            margin-left: 5px;
+        }
+        
+        .edit-btn {
+            background-color: #2196F3;
+            color: white;
+        }
+        
+        .delete-btn {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+        }
+        
+        .modal-content {
             background-color: white;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            font-weight: 600;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            position: relative;
         }
         
-        .table th {
-            border-top: none;
-            font-weight: 600;
-            color: var(--secondary-color);
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #777;
         }
         
-        .badge-pending {
-            background-color: #ffc107;
-            color: var(--dark-color);
+        .modal-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--dark);
         }
         
-        .badge-completed {
-            background-color: #28a745;
+        .form-group {
+            margin-bottom: 15px;
         }
         
-        .badge-cancelled {
-            background-color: #dc3545;
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
         }
         
-        .btn-accent {
-            background-color: var(--accent-color);
-            border-color: var(--accent-color);
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .form-group textarea {
+            height: 100px;
+        }
+        
+        .submit-btn {
+            background-color: var(--primary);
             color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: all 0.3s;
         }
         
-        .btn-accent:hover {
-            background-color: #e05d00;
-            border-color: #e05d00;
-            color: white;
+        .submit-btn:hover {
+            background-color: var(--secondary);
+        }
+        
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
         
         .stat-card {
-            border-left: 4px solid var(--accent-color);
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
         
-        .stat-card .stat-value {
-            font-size: 24px;
-            font-weight: 600;
+        .stat-value {
+            font-size: 30px;
+            font-weight: bold;
+            margin: 10px 0;
         }
         
-        .stat-card .stat-label {
-            color: var(--secondary-color);
-            font-size: 14px;
+        .stat-title {
+            color: #777;
         }
         
-        .form-control, .form-select {
-            border-radius: 5px;
-            padding: 10px 15px;
+        .primary-stat {
+            border-top: 4px solid var(--primary);
         }
         
-        .image-preview {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 5px;
-            margin-right: 10px;
-            margin-bottom: 10px;
+        .success-stat {
+            border-top: 4px solid var(--success);
+        }
+        
+        .danger-stat {
+            border-top: 4px solid var(--danger);
+        }
+        
+        .warning-stat {
+            border-top: 4px solid var(--secondary);
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-right: 0;
+            }
+            
+            .admin-container {
+                flex-direction: column;
+            }
+            
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="d-flex">
-        <!-- Sidebar -->
-        <div class="sidebar d-none d-md-block" style="width: 250px;">
-            <div class="text-center mb-4">
-                <h4>Afghan Shop</h4>
-                <p class="text-muted">Admin Panel</p>
+    <div class="admin-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">
+                    <i class="fas fa-fire"></i>
+                    <span>Free Fire Afghan</span>
+                </div>
+                <small>اډمین پینل</small>
             </div>
             
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link active" href="#" data-section="dashboard">
-                        <i class="fas fa-tachometer-alt"></i> Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" data-section="diamonds">
-                        <i class="fas fa-gem"></i> Diamonds/UC
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" data-section="accounts">
-                        <i class="fas fa-user-tag"></i> Game Accounts
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" data-section="withdrawals">
-                        <i class="fas fa-hand-holding-usd"></i> Withdrawals
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" data-section="orders">
-                        <i class="fas fa-shopping-cart"></i> Orders
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" data-section="users">
-                        <i class="fas fa-users"></i> Users
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" data-section="notifications">
-                        <i class="fas fa-bell"></i> Notifications
-                    </a>
-                </li>
-                <li class="nav-item mt-3">
-                    <a class="nav-link" href="#" id="logoutBtn">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </a>
-                </li>
+            <ul class="sidebar-menu">
+                <li><a href="#" class="active" id="dashboard-link"><i class="fas fa-tachometer-alt"></i> ډشبورډ</a></li>
+                <li><a href="#" id="accounts-link"><i class="fas fa-users"></i> اکاونټونه</a></li>
+                <li><a href="#" id="notifications-link"><i class="fas fa-bell"></i> خبرتیاوې</a></li>
+                <li><a href="#" id="diamonds-link"><i class="fas fa-gem"></i> الماسونه</a></li>
+                <li><a href="#" id="users-link"><i class="fas fa-user-cog"></i> کارونکي</a></li>
+                <li><a href="#" id="logout-link"><i class="fas fa-sign-out-alt"></i> وتل</a></li>
             </ul>
         </div>
         
-        <!-- Main Content -->
-        <div class="main-content flex-grow-1">
-            <!-- Dashboard Section -->
-            <section id="dashboard-section" class="content-section">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h3>Dashboard</h3>
-                    <div class="text-muted">
-                        <span id="currentDate"></span>
-                    </div>
+        <div class="main-content">
+            <div class="top-nav">
+                <div class="search-bar">
+                    <input type="text" placeholder="لټون...">
+                    <i class="fas fa-search"></i>
                 </div>
                 
-                <div class="row mb-4">
-                    <div class="col-md-3">
-                        <div class="card stat-card">
-                            <div class="card-body">
-                                <div class="stat-value" id="totalUsers">0</div>
-                                <div class="stat-label">Total Users</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card stat-card">
-                            <div class="card-body">
-                                <div class="stat-value" id="totalOrders">0</div>
-                                <div class="stat-label">Total Orders</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card stat-card">
-                            <div class="card-body">
-                                <div class="stat-value" id="pendingWithdrawals">0</div>
-                                <div class="stat-label">Pending Withdrawals</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card stat-card">
-                            <div class="card-body">
-                                <div class="stat-value" id="totalRevenue">$0</div>
-                                <div class="stat-label">Total Revenue</div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="user-info">
+                    <span id="admin-username">اډمین</span>
+                    <img src="https://via.placeholder.com/40" alt="User" id="admin-image">
                 </div>
-                
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                Recent Orders
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>ID</th>
-                                                <th>Type</th>
-                                                <th>Amount</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="recentOrders">
-                                            <!-- Orders will be loaded here -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+            </div>
+            
+            <div class="content-area">
+                <!-- Dashboard Section -->
+                <div id="dashboard-section">
+                    <h1 class="page-title"><i class="fas fa-tachometer-alt"></i> ډشبورډ</h1>
+                    
+                    <div class="stats-cards">
+                        <div class="stat-card primary-stat">
+                            <div class="stat-title">ټول اکاونټونه</div>
+                            <div class="stat-value" id="total-accounts">0</div>
+                        </div>
+                        
+                        <div class="stat-card success-stat">
+                            <div class="stat-title">فعال اکاونټونه</div>
+                            <div class="stat-value" id="active-accounts">0</div>
+                        </div>
+                        
+                        <div class="stat-card danger-stat">
+                            <div class="stat-title">کارونکي</div>
+                            <div class="stat-value" id="total-users">0</div>
+                        </div>
+                        
+                        <div class="stat-card warning-stat">
+                            <div class="stat-title">نوي تبصرې</div>
+                            <div class="stat-value" id="new-comments">0</div>
                         </div>
                     </div>
                     
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                Pending Withdrawals
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>User</th>
-                                                <th>FF ID</th>
-                                                <th>Amount</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="pendingWithdrawalsList">
-                                            <!-- Withdrawals will be loaded here -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                    <div class="card">
+                        <div class="card-title">
+                            <span>وروستي اکاونټونه</span>
                         </div>
-                    </div>
-                </div>
-            </section>
-            
-            <!-- Diamonds/UC Section -->
-            <section id="diamonds-section" class="content-section" style="display: none;">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h3>Diamonds & UC Management</h3>
-                    <button class="btn btn-accent" data-bs-toggle="modal" data-bs-target="#addPackageModal">
-                        <i class="fas fa-plus me-2"></i> Add Package
-                    </button>
-                </div>
-                
-                <ul class="nav nav-tabs" id="currencyTabs">
-                    <li class="nav-item">
-                        <a class="nav-link active" data-bs-toggle="tab" href="#diamondsTab">Free Fire Diamonds</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#ucTab">PUBG UC</a>
-                    </li>
-                </ul>
-                
-                <div class="tab-content mt-3">
-                    <div class="tab-pane fade show active" id="diamondsTab">
+                        
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table>
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Amount</th>
-                                        <th>Price (USD)</th>
-                                        <th>Price (AFN)</th>
-                                        <th>Actions</th>
+                                        <th>نوم</th>
+                                        <th>لیول</th>
+                                        <th>قیمت</th>
+                                        <th>حالت</th>
+                                        <th>عملیې</th>
                                     </tr>
                                 </thead>
-                                <tbody id="diamondsTable">
-                                    <!-- Diamonds packages will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="tab-pane fade" id="ucTab">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Amount</th>
-                                        <th>Price (USD)</th>
-                                        <th>Price (AFN)</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="ucTable">
-                                    <!-- UC packages will be loaded here -->
+                                <tbody id="recent-accounts">
+                                    <!-- Recent accounts will be loaded here -->
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-            </section>
-            
-            <!-- Game Accounts Section -->
-            <section id="accounts-section" class="content-section" style="display: none;">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h3>Game Accounts Management</h3>
-                    <button class="btn btn-accent" data-bs-toggle="modal" data-bs-target="#addAccountModal">
-                        <i class="fas fa-plus me-2"></i> Add Account
-                    </button>
-                </div>
                 
-                <ul class="nav nav-tabs" id="gameTabs">
-                    <li class="nav-item">
-                        <a class="nav-link active" data-bs-toggle="tab" href="#freefireTab">Free Fire</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#pubgTab">PUBG</a>
-                    </li>
-                </ul>
-                
-                <div class="tab-content mt-3">
-                    <div class="tab-pane fade show active" id="freefireTab">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Name</th>
-                                        <th>Level</th>
-                                        <th>Price (USD)</th>
-                                        <th>Price (AFN)</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="freefireTable">
-                                    <!-- Free Fire accounts will be loaded here -->
-                                </tbody>
-                            </table>
+                <!-- Accounts Section -->
+                <div id="accounts-section" style="display: none;">
+                    <h1 class="page-title"><i class="fas fa-users"></i> اکاونټونه مدیریت</h1>
+                    
+                    <div class="card">
+                        <div class="card-title">
+                            <span>ټول اکاونټونه</span>
+                            <button class="add-btn" id="add-account-btn"><i class="fas fa-plus"></i></button>
                         </div>
-                    </div>
-                    <div class="tab-pane fade" id="pubgTab">
+                        
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table>
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Name</th>
-                                        <th>Level</th>
-                                        <th>Price (USD)</th>
-                                        <th>Price (AFN)</th>
-                                        <th>Actions</th>
+                                        <th>نوم</th>
+                                        <th>لیول</th>
+                                        <th>قیمت</th>
+                                        <th>پلورونکی</th>
+                                        <th>نیټه</th>
+                                        <th>حالت</th>
+                                        <th>عملیې</th>
                                     </tr>
                                 </thead>
-                                <tbody id="pubgTable">
-                                    <!-- PUBG accounts will be loaded here -->
+                                <tbody id="all-accounts">
+                                    <!-- All accounts will be loaded here -->
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-            </section>
-            
-            <!-- Withdrawals Section -->
-            <section id="withdrawals-section" class="content-section" style="display: none;">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h3>Withdrawal Requests</h3>
-                    <div class="btn-group">
-                        <button class="btn btn-outline-secondary active" data-filter="all">All</button>
-                        <button class="btn btn-outline-secondary" data-filter="pending">Pending</button>
-                        <button class="btn btn-outline-secondary" data-filter="completed">Completed</button>
-                        <button class="btn btn-outline-secondary" data-filter="cancelled">Cancelled</button>
+                
+                <!-- Notifications Section -->
+                <div id="notifications-section" style="display: none;">
+                    <h1 class="page-title"><i class="fas fa-bell"></i> خبرتیاوې مدیریت</h1>
+                    
+                    <div class="card">
+                        <div class="card-title">
+                            <span>خبرتیاوې</span>
+                            <button class="add-btn" id="add-notification-btn"><i class="fas fa-plus"></i></button>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>سرلیک</th>
+                                        <th>محتوا</th>
+                                        <th>نیټه</th>
+                                        <th>عملیې</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="notifications-list">
+                                    <!-- Notifications will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>User</th>
-                                <th>FF ID</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="withdrawalsTable">
-                            <!-- Withdrawals will be loaded here -->
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-            
-            <!-- Orders Section -->
-            <section id="orders-section" class="content-section" style="display: none;">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h3>Orders Management</h3>
-                    <div class="btn-group">
-                        <button class="btn btn-outline-secondary active" data-filter="all">All</button>
-                        <button class="btn btn-outline-secondary" data-filter="pending">Pending</button>
-                        <button class="btn btn-outline-secondary" data-filter="completed">Completed</button>
-                        <button class="btn btn-outline-secondary" data-filter="cancelled">Cancelled</button>
+                <!-- Diamonds Section -->
+                <div id="diamonds-section" style="display: none;">
+                    <h1 class="page-title"><i class="fas fa-gem"></i> الماسونه مدیریت</h1>
+                    
+                    <div class="card">
+                        <div class="card-title">
+                            <span>الماس قیمتونه</span>
+                            <button class="add-btn" id="add-diamond-btn"><i class="fas fa-plus"></i></button>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>مقدار</th>
+                                        <th>قیمت</th>
+                                        <th>عملیې</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="diamonds-list">
+                                    <!-- Diamonds will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>User</th>
-                                <th>Type</th>
-                                <th>Amount</th>
-                                <th>Price</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="ordersTable">
-                            <!-- Orders will be loaded here -->
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-            
-            <!-- Users Section -->
-            <section id="users-section" class="content-section" style="display: none;">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h3>Users Management</h3>
-                    <div class="input-group" style="width: 300px;">
-                        <input type="text" class="form-control" placeholder="Search users..." id="userSearch">
-                        <button class="btn btn-outline-secondary" type="button">
-                            <i class="fas fa-search"></i>
-                        </button>
+                <!-- Users Section -->
+                <div id="users-section" style="display: none;">
+                    <h1 class="page-title"><i class="fas fa-user-cog"></i> کارونکي مدیریت</h1>
+                    
+                    <div class="card">
+                        <div class="card-title">
+                            <span>ټول کارونکي</span>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>نوم</th>
+                                        <th>بریښنالیک</th>
+                                        <th>شمیره</th>
+                                        <th>نیټه</th>
+                                        <th>عملیې</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-list">
+                                    <!-- Users will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Email</th>
-                                <th>Referrals</th>
-                                <th>Balance</th>
-                                <th>Joined</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="usersTable">
-                            <!-- Users will be loaded here -->
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-            
-            <!-- Notifications Section -->
-            <section id="notifications-section" class="content-section" style="display: none;">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h3>Send Notification</h3>
-                </div>
-                
-                <div class="card">
-                    <div class="card-body">
-                        <form id="notificationForm">
-                            <div class="mb-3">
-                                <label for="notificationTitle" class="form-label">Title</label>
-                                <input type="text" class="form-control" id="notificationTitle" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="notificationMessage" class="form-label">Message</label>
-                                <textarea class="form-control" id="notificationMessage" rows="3" required></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Send To</label>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="notificationTarget" id="allUsers" value="all" checked>
-                                    <label class="form-check-label" for="allUsers">
-                                        All Users
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="notificationTarget" id="specificUser" value="specific">
-                                    <label class="form-check-label" for="specificUser">
-                                        Specific User
-                                    </label>
-                                </div>
-                                <div class="mt-2" id="userSelectContainer" style="display: none;">
-                                    <select class="form-select" id="notificationUser">
-                                        <!-- Users will be loaded here -->
-                                    </select>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-accent">
-                                <i class="fas fa-paper-plane me-2"></i> Send Notification
-                            </button>
-                        </form>
-                    </div>
-                </div>
-                
-                <h4 class="mt-4 mb-3">Notification History</h4>
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Message</th>
-                                <th>Sent To</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody id="notificationsTable">
-                            <!-- Notifications will be loaded here -->
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </div>
-    </div>
-    
-    <!-- Add Package Modal -->
-    <div class="modal fade" id="addPackageModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add New Package</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="packageForm">
-                        <div class="mb-3">
-                            <label for="packageType" class="form-label">Package Type</label>
-                            <select class="form-select" id="packageType" required>
-                                <option value="diamonds">Free Fire Diamonds</option>
-                                <option value="uc">PUBG UC</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="packageAmount" class="form-label">Amount</label>
-                            <input type="number" class="form-control" id="packageAmount" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="packagePriceUsd" class="form-label">Price (USD)</label>
-                            <input type="number" step="0.01" class="form-control" id="packagePriceUsd" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="packagePriceAfn" class="form-label">Price (AFN)</label>
-                            <input type="number" class="form-control" id="packagePriceAfn" required>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-accent" id="savePackageBtn">Save Package</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Edit Package Modal -->
-    <div class="modal fade" id="editPackageModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit Package</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="editPackageForm">
-                        <input type="hidden" id="editPackageId">
-                        <input type="hidden" id="editPackageDb">
-                        <div class="mb-3">
-                            <label for="editPackageAmount" class="form-label">Amount</label>
-                            <input type="number" class="form-control" id="editPackageAmount" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editPackagePriceUsd" class="form-label">Price (USD)</label>
-                            <input type="number" step="0.01" class="form-control" id="editPackagePriceUsd" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editPackagePriceAfn" class="form-label">Price (AFN)</label>
-                            <input type="number" class="form-control" id="editPackagePriceAfn" required>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-accent" id="updatePackageBtn">Update Package</button>
                 </div>
             </div>
         </div>
     </div>
     
     <!-- Add Account Modal -->
-    <div class="modal fade" id="addAccountModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add Game Account</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="accountForm">
-                        <div class="mb-3">
-                            <label for="accountGame" class="form-label">Game</label>
-                            <select class="form-select" id="accountGame" required>
-                                <option value="freefire">Free Fire</option>
-                                <option value="pubg">PUBG Mobile</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="accountName" class="form-label">Account Name</label>
-                            <input type="text" class="form-control" id="accountName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="accountLevel" class="form-label">Level</label>
-                            <input type="number" class="form-control" id="accountLevel" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="accountPriceUsd" class="form-label">Price (USD)</label>
-                            <input type="number" step="0.01" class="form-control" id="accountPriceUsd" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="accountPriceAfn" class="form-label">Price (AFN)</label>
-                            <input type="number" class="form-control" id="accountPriceAfn" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="accountDescription" class="form-label">Description</label>
-                            <textarea class="form-control" id="accountDescription" rows="3"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Images (Upload 4 images)</label>
-                            <input type="file" class="form-control" id="accountImages" multiple accept="image/*">
-                            <div class="mt-2" id="imagePreviews"></div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-accent" id="saveAccountBtn">Save Account</button>
-                </div>
+    <div class="modal" id="account-modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-account-modal">&times;</span>
+            <h2 class="modal-title">نوی اکاونټ اضافه کړئ</h2>
+            
+            <div class="form-group">
+                <label for="admin-account-name">د اکاونټ نوم</label>
+                <input type="text" id="admin-account-name" placeholder="د اکاونټ نوم ولیکئ">
             </div>
+            
+            <div class="form-group">
+                <label for="admin-account-level">د اکاونټ لیول</label>
+                <input type="number" id="admin-account-level" placeholder="د اکاونټ لیول ولیکئ">
+            </div>
+            
+            <div class="form-group">
+                <label for="admin-account-price">قیمت (افغانیو کی)</label>
+                <input type="number" id="admin-account-price" placeholder="د اکاونټ قیمت افغانیو کی ولیکئ">
+            </div>
+            
+            <div class="form-group">
+                <label for="admin-account-details">د اکاونټ معلومات</label>
+                <textarea id="admin-account-details" placeholder="د اکاونټ نور معلومات دلته ولیکئ"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="admin-account-image">د اکاونټ عکس</label>
+                <input type="file" id="admin-account-image" accept="image/*">
+            </div>
+            
+            <div class="form-group">
+                <label for="admin-account-status">حالت</label>
+                <select id="admin-account-status">
+                    <option value="active">فعال</option>
+                    <option value="inactive">غیر فعال</option>
+                </select>
+            </div>
+            
+            <button class="submit-btn" id="submit-admin-account-btn">ثبتول</button>
         </div>
     </div>
     
-    <!-- Edit Account Modal -->
-    <div class="modal fade" id="editAccountModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit Game Account</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="editAccountForm">
-                        <input type="hidden" id="editAccountId">
-                        <div class="mb-3">
-                            <label for="editAccountName" class="form-label">Account Name</label>
-                            <input type="text" class="form-control" id="editAccountName" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editAccountLevel" class="form-label">Level</label>
-                            <input type="number" class="form-control" id="editAccountLevel" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editAccountPriceUsd" class="form-label">Price (USD)</label>
-                            <input type="number" step="0.01" class="form-control" id="editAccountPriceUsd" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editAccountPriceAfn" class="form-label">Price (AFN)</label>
-                            <input type="number" class="form-control" id="editAccountPriceAfn" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="editAccountDescription" class="form-label">Description</label>
-                            <textarea class="form-control" id="editAccountDescription" rows="3"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Current Images</label>
-                            <div id="currentImages"></div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Update Images (Optional)</label>
-                            <input type="file" class="form-control" id="editAccountImages" multiple accept="image/*">
-                            <div class="mt-2" id="editImagePreviews"></div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-accent" id="updateAccountBtn">Update Account</button>
-                </div>
+    <!-- Add Notification Modal -->
+    <div class="modal" id="notification-modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-notification-modal">&times;</span>
+            <h2 class="modal-title">نوې خبرتیا اضافه کړئ</h2>
+            
+            <div class="form-group">
+                <label for="notification-title">سرلیک</label>
+                <input type="text" id="notification-title" placeholder="د خبرتیا سرلیک ولیکئ">
             </div>
+            
+            <div class="form-group">
+                <label for="notification-content">محتوا</label>
+                <textarea id="notification-content" placeholder="د خبرتیا محتوا ولیکئ"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="notification-image">عکس (اختیاري)</label>
+                <input type="file" id="notification-image" accept="image/*">
+            </div>
+            
+            <button class="submit-btn" id="submit-notification-btn">خبرتیا ولیږئ</button>
         </div>
     </div>
     
-    <!-- View Order Modal -->
-    <div class="modal fade" id="viewOrderModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Order Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <h6>Order ID</h6>
-                        <p id="orderIdText"></p>
-                    </div>
-                    <div class="mb-3">
-                        <h6>User</h6>
-                        <p id="orderUser"></p>
-                    </div>
-                    <div class="mb-3">
-                        <h6>Type</h6>
-                        <p id="orderType"></p>
-                    </div>
-                    <div class="mb-3">
-                        <h6>Amount</h6>
-                        <p id="orderAmount"></p>
-                    </div>
-                    <div class="mb-3">
-                        <h6>Price</h6>
-                        <p id="orderPrice"></p>
-                    </div>
-                    <div class="mb-3">
-                        <h6>Status</h6>
-                        <p id="orderStatus"></p>
-                    </div>
-                    <div class="mb-3">
-                        <h6>Date</h6>
-                        <p id="orderDate"></p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <div id="orderActionButtons">
-                        <!-- Action buttons will be added here -->
-                    </div>
-                </div>
+    <!-- Add Diamond Modal -->
+    <div class="modal" id="diamond-modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-diamond-modal">&times;</span>
+            <h2 class="modal-title">نوی الماس اضافه کړئ</h2>
+            
+            <div class="form-group">
+                <label for="diamond-amount">مقدار</label>
+                <input type="number" id="diamond-amount" placeholder="د الماس مقدار ولیکئ">
             </div>
+            
+            <div class="form-group">
+                <label for="diamond-price">قیمت (افغانیو کی)</label>
+                <input type="number" id="diamond-price" placeholder="د الماس قیمت افغانیو کی ولیکئ">
+            </div>
+            
+            <button class="submit-btn" id="submit-diamond-btn">ثبتول</button>
         </div>
     </div>
     
-    <!-- View Withdrawal Modal -->
-    <div class="modal fade" id="viewWithdrawalModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Withdrawal Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <h6>Withdrawal ID</h6>
-                        <p id="withdrawalIdText"></p>
-                    </div>
-                    <div class="mb-3">
-                        <h6>User</h6>
-                        <p id="withdrawalUser"></p>
-                    </div>
-                    <div class="mb-3">
-                        <h6>Free Fire ID</h6>
-                        <p id="withdrawalFfId"></p>
-                    </div>
-                    <div class="mb-3">
-                        <h6>Amount</h6>
-                        <p id="withdrawalAmount"></p>
-                    </div>
-                    <div class="mb-3">
-                        <h6>Status</h6>
-                        <p id="withdrawalStatus"></p>
-                    </div>
-                    <div class="mb-3">
-                        <h6>Date</h6>
-                        <p id="withdrawalDate"></p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <div id="withdrawalActionButtons">
-                        <!-- Action buttons will be added here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     
-    <!-- View User Modal -->
-    <div class="modal fade" id="viewUserModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">User Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <h6>User ID</h6>
-                        <p id="userIdText"></p>
-                    </div>
-                    <div class="mb-3">
-                        <h6>Email</h6>
-                        <p id="userEmail"></p>
-                    </div>
-                    <div class="mb-3">
-                        <h6>Referral Code</h6>
-                        <p id="userRefCode"></p>
-                    </div>
-                    <div class="mb-3">
-                        <h6>Balance</h6>
-                        <p id="userBalance"></p>
-                    </div>
-                    <div class="mb-3">
-                        <h6>Total Referrals</h6>
-                        <p id="userReferrals"></p>
-                    </div>
-                    <div class="mb-3">
-                        <h6>Joined Date</h6>
-                        <p id="userJoined"></p>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-accent" id="editUserBalanceBtn">Edit Balance</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Edit User Balance Modal -->
-    <div class="modal fade" id="editBalanceModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit User Balance</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="balanceForm">
-                        <input type="hidden" id="balanceUserId">
-                        <div class="mb-3">
-                            <label for="newBalance" class="form-label">New Balance</label>
-                            <input type="number" class="form-control" id="newBalance" required>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-accent" id="saveBalanceBtn">Save Changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
     <script>
-        // Initialize Firebase
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyD4UbW_Iy4kUWH3V70Q1mWCI4-_KFk6ku4",
             authDomain: "onlinewark-a0147.firebaseapp.com",
@@ -910,1014 +690,731 @@
             appId: "1:92155538620:android:5e198a8eea6bf17f61f4b9"
         };
         
+        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        const database = firebase.database();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+        const realtimeDb = firebase.database();
         
-        // Admin credentials (in a real app, this should be handled with proper authentication)
-        const ADMIN_EMAIL = "admin@afghanshop.com";
-        const ADMIN_PASSWORD = "admin123";
+        // DOM Elements
+        const dashboardSection = document.getElementById('dashboard-section');
+        const accountsSection = document.getElementById('accounts-section');
+        const notificationsSection = document.getElementById('notifications-section');
+        const diamondsSection = document.getElementById('diamonds-section');
+        const usersSection = document.getElementById('users-section');
         
-        // Current date
-        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
+        const dashboardLink = document.getElementById('dashboard-link');
+        const accountsLink = document.getElementById('accounts-link');
+        const notificationsLink = document.getElementById('notifications-link');
+        const diamondsLink = document.getElementById('diamonds-link');
+        const usersLink = document.getElementById('users-link');
+        const logoutLink = document.getElementById('logout-link');
         
-        // Login as admin
-        auth.signInWithEmailAndPassword(ADMIN_EMAIL, ADMIN_PASSWORD)
-            .then(() => {
-                loadDashboardStats();
-                loadDiamonds();
-                loadUC();
-                loadAccounts();
-                loadWithdrawals();
-                loadOrders();
-                loadUsers();
-                loadNotifications();
-            })
-            .catch((error) => {
-                console.error("Admin login error:", error);
-                alert("Failed to login as admin. Please check console for details.");
-            });
+        const totalAccounts = document.getElementById('total-accounts');
+        const activeAccounts = document.getElementById('active-accounts');
+        const totalUsers = document.getElementById('total-users');
+        const newComments = document.getElementById('new-comments');
+        const recentAccounts = document.getElementById('recent-accounts');
+        const allAccounts = document.getElementById('all-accounts');
+        const notificationsList = document.getElementById('notifications-list');
+        const diamondsList = document.getElementById('diamonds-list');
+        const usersList = document.getElementById('users-list');
         
-        // Logout
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            auth.signOut()
-                .then(() => {
-                    window.location.href = 'index.html';
-                });
-        });
+        const addAccountBtn = document.getElementById('add-account-btn');
+        const addNotificationBtn = document.getElementById('add-notification-btn');
+        const addDiamondBtn = document.getElementById('add-diamond-btn');
         
-        // Navigation
-        document.querySelectorAll('[data-section]').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const sectionId = this.getAttribute('data-section') + '-section';
-                
-                // Hide all sections
-                document.querySelectorAll('.content-section').forEach(section => {
-                    section.style.display = 'none';
-                });
-                
-                // Show selected section
-                document.getElementById(sectionId).style.display = 'block';
-                
-                // Update active nav link
-                document.querySelectorAll('.sidebar .nav-link').forEach(navLink => {
-                    navLink.classList.remove('active');
-                });
-                this.classList.add('active');
-            });
-        });
+        const accountModal = document.getElementById('account-modal');
+        const closeAccountModal = document.getElementById('close-account-modal');
+        const submitAdminAccountBtn = document.getElementById('submit-admin-account-btn');
         
-        // Filter buttons
-        document.querySelectorAll('[data-filter]').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const filter = this.getAttribute('data-filter');
-                
-                // Update active button
-                this.parentElement.querySelectorAll('.btn').forEach(b => {
-                    b.classList.remove('active');
-                });
-                this.classList.add('active');
-                
-                // Filter content
-                if (this.closest('#withdrawals-section')) {
-                    filterWithdrawals(filter);
-                } else if (this.closest('#orders-section')) {
-                    filterOrders(filter);
-                }
-            });
-        });
+        const notificationModal = document.getElementById('notification-modal');
+        const closeNotificationModal = document.getElementById('close-notification-modal');
+        const submitNotificationBtn = document.getElementById('submit-notification-btn');
         
-        // Load dashboard statistics
-        function loadDashboardStats() {
-            // Total users
-            database.ref('users').once('value')
-                .then(snapshot => {
-                    document.getElementById('totalUsers').textContent = snapshot.numChildren();
-                });
-            
-            // Total orders
-            database.ref('orders').once('value')
-                .then(snapshot => {
-                    document.getElementById('totalOrders').textContent = snapshot.numChildren();
-                });
-            
-            // Pending withdrawals
-            database.ref('withdrawals').orderByChild('status').equalTo('pending').once('value')
-                .then(snapshot => {
-                    document.getElementById('pendingWithdrawals').textContent = snapshot.numChildren();
-                });
-            
-            // Total revenue (sum of all completed orders)
-            database.ref('orders').orderByChild('status').equalTo('completed').once('value')
-                .then(snapshot => {
-                    let total = 0;
-                    snapshot.forEach(order => {
-                        total += parseFloat(order.val().priceUsd);
-                    });
-                    document.getElementById('totalRevenue').textContent = '$' + total.toFixed(2);
-                });
-            
-            // Recent orders
-            database.ref('orders').limitToLast(5).once('value')
-                .then(snapshot => {
-                    const ordersTable = document.getElementById('recentOrders');
-                    ordersTable.innerHTML = '';
-                    
-                    snapshot.forEach(order => {
-                        const orderData = order.val();
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${order.key.substr(0, 6)}...</td>
-                            <td>${orderData.type === 'diamonds' ? 'Diamonds' : 'UC'}</td>
-                            <td>${orderData.amount}</td>
-                            <td><span class="badge ${getStatusBadgeClass(orderData.status)}">${orderData.status}</span></td>
-                        `;
-                        row.addEventListener('click', () => viewOrder(order.key, orderData));
-                        ordersTable.appendChild(row);
-                    });
-                });
-            
-            // Pending withdrawals list
-            database.ref('withdrawals').orderByChild('status').equalTo('pending').limitToLast(5).once('value')
-                .then(snapshot => {
-                    const withdrawalsTable = document.getElementById('pendingWithdrawalsList');
-                    withdrawalsTable.innerHTML = '';
-                    
-                    snapshot.forEach(withdrawal => {
-                        const withdrawalData = withdrawal.val();
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${withdrawalData.email}</td>
-                            <td>${withdrawalData.ffId}</td>
-                            <td>${withdrawalData.amount} diamonds</td>
-                            <td>
-                                <button class="btn btn-sm btn-success me-1" onclick="processWithdrawal('${withdrawal.key}', 'completed', event)">Complete</button>
-                                <button class="btn btn-sm btn-danger" onclick="processWithdrawal('${withdrawal.key}', 'cancelled', event)">Cancel</button>
-                            </td>
-                        `;
-                        withdrawalsTable.appendChild(row);
-                    });
-                });
-        }
+        const diamondModal = document.getElementById('diamond-modal');
+        const closeDiamondModal = document.getElementById('close-diamond-modal');
+        const submitDiamondBtn = document.getElementById('submit-diamond-btn');
         
-        // Get badge class based on status
-        function getStatusBadgeClass(status) {
-            switch(status) {
-                case 'pending': return 'badge-pending';
-                case 'completed': return 'badge-completed';
-                case 'cancelled': return 'badge-cancelled';
-                default: return 'badge-secondary';
-            }
-        }
+        const adminUsername = document.getElementById('admin-username');
+        const adminImage = document.getElementById('admin-image');
         
-        // Load diamonds packages
-        function loadDiamonds() {
-            database.ref('diamonds').once('value')
-                .then(snapshot => {
-                    const diamondsTable = document.getElementById('diamondsTable');
-                    diamondsTable.innerHTML = '';
-                    
-                    if (!snapshot.exists()) {
-                        diamondsTable.innerHTML = '<tr><td colspan="5" class="text-center">No diamond packages found</td></tr>';
-                        return;
-                    }
-                    
-                    snapshot.forEach(package => {
-                        const packageData = package.val();
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${package.key.substr(0, 6)}...</td>
-                            <td>${packageData.amount}</td>
-                            <td>$${packageData.priceUsd}</td>
-                            <td>${packageData.priceAfn} AFN</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary me-1" onclick="editPackage('diamonds', '${package.key}', ${packageData.amount}, ${packageData.priceUsd}, ${packageData.priceAfn})">Edit</button>
-                                <button class="btn btn-sm btn-danger" onclick="deletePackage('diamonds', '${package.key}')">Delete</button>
-                            </td>
-                        `;
-                        diamondsTable.appendChild(row);
-                    });
-                });
-        }
+        // Global variables
+        let currentAdmin = null;
+        let currentEditId = null;
         
-        // Load UC packages
-        function loadUC() {
-            database.ref('uc').once('value')
-                .then(snapshot => {
-                    const ucTable = document.getElementById('ucTable');
-                    ucTable.innerHTML = '';
-                    
-                    if (!snapshot.exists()) {
-                        ucTable.innerHTML = '<tr><td colspan="5" class="text-center">No UC packages found</td></tr>';
-                        return;
-                    }
-                    
-                    snapshot.forEach(package => {
-                        const packageData = package.val();
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${package.key.substr(0, 6)}...</td>
-                            <td>${packageData.amount}</td>
-                            <td>$${packageData.priceUsd}</td>
-                            <td>${packageData.priceAfn} AFN</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary me-1" onclick="editPackage('uc', '${package.key}', ${packageData.amount}, ${packageData.priceUsd}, ${packageData.priceAfn})">Edit</button>
-                                <button class="btn btn-sm btn-danger" onclick="deletePackage('uc', '${package.key}')">Delete</button>
-                            </td>
-                        `;
-                        ucTable.appendChild(row);
-                    });
-                });
-        }
-        
-        // Load game accounts
-        function loadAccounts() {
-            // Free Fire accounts
-            database.ref('items').orderByChild('game').equalTo('freefire').once('value')
-                .then(snapshot => {
-                    const freefireTable = document.getElementById('freefireTable');
-                    freefireTable.innerHTML = '';
-                    
-                    if (!snapshot.exists()) {
-                        freefireTable.innerHTML = '<tr><td colspan="6" class="text-center">No Free Fire accounts found</td></tr>';
-                        return;
-                    }
-                    
-                    snapshot.forEach(account => {
-                        const accountData = account.val();
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${account.key.substr(0, 6)}...</td>
-                            <td>${accountData.name}</td>
-                            <td>${accountData.level}</td>
-                            <td>$${accountData.priceUsd}</td>
-                            <td>${accountData.priceAfn} AFN</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary me-1" onclick="editAccount('${account.key}', '${accountData.name}', ${accountData.level}, ${accountData.priceUsd}, ${accountData.priceAfn}, '${accountData.description}', ${JSON.stringify(accountData.images || [])})">Edit</button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteAccount('${account.key}')">Delete</button>
-                            </td>
-                        `;
-                        freefireTable.appendChild(row);
-                    });
-                });
-            
-            // PUBG accounts
-            database.ref('items').orderByChild('game').equalTo('pubg').once('value')
-                .then(snapshot => {
-                    const pubgTable = document.getElementById('pubgTable');
-                    pubgTable.innerHTML = '';
-                    
-                    if (!snapshot.exists()) {
-                        pubgTable.innerHTML = '<tr><td colspan="6" class="text-center">No PUBG accounts found</td></tr>';
-                        return;
-                    }
-                    
-                    snapshot.forEach(account => {
-                        const accountData = account.val();
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${account.key.substr(0, 6)}...</td>
-                            <td>${accountData.name}</td>
-                            <td>${accountData.level}</td>
-                            <td>$${accountData.priceUsd}</td>
-                            <td>${accountData.priceAfn} AFN</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary me-1" onclick="editAccount('${account.key}', '${accountData.name}', ${accountData.level}, ${accountData.priceUsd}, ${accountData.priceAfn}, '${accountData.description}', ${JSON.stringify(accountData.images || [])})">Edit</button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteAccount('${account.key}')">Delete</button>
-                            </td>
-                        `;
-                        pubgTable.appendChild(row);
-                    });
-                });
-        }
-        
-        // Load withdrawals
-        function loadWithdrawals() {
-            database.ref('withdrawals').once('value')
-                .then(snapshot => {
-                    const withdrawalsTable = document.getElementById('withdrawalsTable');
-                    withdrawalsTable.innerHTML = '';
-                    
-                    if (!snapshot.exists()) {
-                        withdrawalsTable.innerHTML = '<tr><td colspan="7" class="text-center">No withdrawals found</td></tr>';
-                        return;
-                    }
-                    
-                    snapshot.forEach(withdrawal => {
-                        const withdrawalData = withdrawal.val();
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${withdrawal.key.substr(0, 6)}...</td>
-                            <td>${withdrawalData.email}</td>
-                            <td>${withdrawalData.ffId}</td>
-                            <td>${withdrawalData.amount} diamonds</td>
-                            <td><span class="badge ${getStatusBadgeClass(withdrawalData.status)}">${withdrawalData.status}</span></td>
-                            <td>${new Date(withdrawalData.timestamp).toLocaleDateString()}</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary" onclick="viewWithdrawal('${withdrawal.key}')">View</button>
-                            </td>
-                        `;
-                        withdrawalsTable.appendChild(row);
-                    });
-                });
-        }
-        
-        // Filter withdrawals
-        function filterWithdrawals(filter) {
-            let query;
-            
-            if (filter === 'all') {
-                query = database.ref('withdrawals');
-            } else {
-                query = database.ref('withdrawals').orderByChild('status').equalTo(filter);
-            }
-            
-            query.once('value')
-                .then(snapshot => {
-                    const withdrawalsTable = document.getElementById('withdrawalsTable');
-                    withdrawalsTable.innerHTML = '';
-                    
-                    if (!snapshot.exists()) {
-                        withdrawalsTable.innerHTML = '<tr><td colspan="7" class="text-center">No withdrawals found</td></tr>';
-                        return;
-                    }
-                    
-                    snapshot.forEach(withdrawal => {
-                        const withdrawalData = withdrawal.val();
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${withdrawal.key.substr(0, 6)}...</td>
-                            <td>${withdrawalData.email}</td>
-                            <td>${withdrawalData.ffId}</td>
-                            <td>${withdrawalData.amount} diamonds</td>
-                            <td><span class="badge ${getStatusBadgeClass(withdrawalData.status)}">${withdrawalData.status}</span></td>
-                            <td>${new Date(withdrawalData.timestamp).toLocaleDateString()}</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary" onclick="viewWithdrawal('${withdrawal.key}')">View</button>
-                            </td>
-                        `;
-                        withdrawalsTable.appendChild(row);
-                    });
-                });
-        }
-        
-        // Load orders
-        function loadOrders() {
-            database.ref('orders').once('value')
-                .then(snapshot => {
-                    const ordersTable = document.getElementById('ordersTable');
-                    ordersTable.innerHTML = '';
-                    
-                    if (!snapshot.exists()) {
-                        ordersTable.innerHTML = '<tr><td colspan="8" class="text-center">No orders found</td></tr>';
-                        return;
-                    }
-                    
-                    snapshot.forEach(order => {
-                        const orderData = order.val();
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${order.key.substr(0, 6)}...</td>
-                            <td>${orderData.email}</td>
-                            <td>${orderData.type === 'diamonds' ? 'Diamonds' : 'UC'}</td>
-                            <td>${orderData.amount}</td>
-                            <td>$${orderData.priceUsd} / ${orderData.priceAfn} AFN</td>
-                            <td><span class="badge ${getStatusBadgeClass(orderData.status)}">${orderData.status}</span></td>
-                            <td>${new Date(orderData.timestamp).toLocaleDateString()}</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary" onclick="viewOrder('${order.key}')">View</button>
-                            </td>
-                        `;
-                        ordersTable.appendChild(row);
-                    });
-                });
-        }
-        
-        // Filter orders
-        function filterOrders(filter) {
-            let query;
-            
-            if (filter === 'all') {
-                query = database.ref('orders');
-            } else {
-                query = database.ref('orders').orderByChild('status').equalTo(filter);
-            }
-            
-            query.once('value')
-                .then(snapshot => {
-                    const ordersTable = document.getElementById('ordersTable');
-                    ordersTable.innerHTML = '';
-                    
-                    if (!snapshot.exists()) {
-                        ordersTable.innerHTML = '<tr><td colspan="8" class="text-center">No orders found</td></tr>';
-                        return;
-                    }
-                    
-                    snapshot.forEach(order => {
-                        const orderData = order.val();
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${order.key.substr(0, 6)}...</td>
-                            <td>${orderData.email}</td>
-                            <td>${orderData.type === 'diamonds' ? 'Diamonds' : 'UC'}</td>
-                            <td>${orderData.amount}</td>
-                            <td>$${orderData.priceUsd} / ${orderData.priceAfn} AFN</td>
-                            <td><span class="badge ${getStatusBadgeClass(orderData.status)}">${orderData.status}</span></td>
-                            <td>${new Date(orderData.timestamp).toLocaleDateString()}</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary" onclick="viewOrder('${order.key}')">View</button>
-                            </td>
-                        `;
-                        ordersTable.appendChild(row);
-                    });
-                });
-        }
-        
-        // Load users
-        function loadUsers() {
-            database.ref('users').once('value')
-                .then(snapshot => {
-                    const usersTable = document.getElementById('usersTable');
-                    usersTable.innerHTML = '';
-                    
-                    // Also populate user select for notifications
-                    const userSelect = document.getElementById('notificationUser');
-                    userSelect.innerHTML = '<option value="">Select user</option>';
-                    
-                    if (!snapshot.exists()) {
-                        usersTable.innerHTML = '<tr><td colspan="6" class="text-center">No users found</td></tr>';
-                        return;
-                    }
-                    
-                    snapshot.forEach(user => {
-                        const userData = user.val();
-                        const referrals = userData.referrals ? Object.keys(userData.referrals).length : 0;
-                        
-                        // Add to users table
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${user.key.substr(0, 6)}...</td>
-                            <td>${userData.email}</td>
-                            <td>${referrals}</td>
-                            <td>${userData.balance || 0} diamonds</td>
-                            <td>${new Date(userData.createdAt).toLocaleDateString()}</td>
-                            <td>
-                                <button class="btn btn-sm btn-primary" onclick="viewUser('${user.key}')">View</button>
-                            </td>
-                        `;
-                        usersTable.appendChild(row);
-                        
-                        // Add to user select dropdown
-                        const option = document.createElement('option');
-                        option.value = user.key;
-                        option.textContent = `${userData.email} (${user.key.substr(0, 6)}...)`;
-                        userSelect.appendChild(option);
-                    });
-                });
-        }
-        
-        // Load notifications
-        function loadNotifications() {
-            database.ref('notifications').limitToLast(10).once('value')
-                .then(snapshot => {
-                    const notificationsTable = document.getElementById('notificationsTable');
-                    notificationsTable.innerHTML = '';
-                    
-                    if (!snapshot.exists()) {
-                        notificationsTable.innerHTML = '<tr><td colspan="4" class="text-center">No notifications found</td></tr>';
-                        return;
-                    }
-                    
-                    snapshot.forEach(notification => {
-                        const notificationData = notification.val();
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${notificationData.title}</td>
-                            <td>${notificationData.message}</td>
-                            <td>${notificationData.target === 'all' ? 'All Users' : 'Specific User'}</td>
-                            <td>${new Date(notificationData.timestamp).toLocaleDateString()}</td>
-                        `;
-                        notificationsTable.appendChild(row);
-                    });
-                });
-        }
-        
-        // Notification target radio buttons
-        document.querySelectorAll('input[name="notificationTarget"]').forEach(radio => {
-            radio.addEventListener('change', function() {
-                document.getElementById('userSelectContainer').style.display = 
-                    this.value === 'specific' ? 'block' : 'none';
-            });
-        });
-        
-        // Send notification
-        document.getElementById('notificationForm').addEventListener('submit', function(e) {
+        // Event Listeners
+        dashboardLink.addEventListener('click', (e) => {
             e.preventDefault();
-            
-            const title = document.getElementById('notificationTitle').value;
-            const message = document.getElementById('notificationMessage').value;
-            const target = document.querySelector('input[name="notificationTarget"]:checked').value;
-            const userId = target === 'specific' ? document.getElementById('notificationUser').value : null;
-            
-            if (target === 'specific' && !userId) {
-                alert('Please select a user');
-                return;
-            }
-            
-            const notification = {
-                title: title,
-                message: message,
-                target: target,
-                userId: userId,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            };
-            
-            database.ref('notifications').push(notification)
-                .then(() => {
-                    alert('Notification sent successfully');
-                    document.getElementById('notificationForm').reset();
-                    document.getElementById('userSelectContainer').style.display = 'none';
-                    document.getElementById('allUsers').checked = true;
-                    loadNotifications();
-                })
-                .catch(error => {
-                    console.error('Error sending notification:', error);
-                    alert('Failed to send notification');
-                });
+            showSection('dashboard');
         });
         
-        // Save new package
-        document.getElementById('savePackageBtn').addEventListener('click', function() {
-            const type = document.getElementById('packageType').value;
-            const amount = document.getElementById('packageAmount').value;
-            const priceUsd = document.getElementById('packagePriceUsd').value;
-            const priceAfn = document.getElementById('packagePriceAfn').value;
-            
-            if (!amount || !priceUsd || !priceAfn) {
-                alert('Please fill all fields');
-                return;
-            }
-            
-            const packageData = {
-                amount: parseInt(amount),
-                priceUsd: parseFloat(priceUsd),
-                priceAfn: parseInt(priceAfn)
-            };
-            
-            const dbRef = type === 'diamonds' ? database.ref('diamonds') : database.ref('uc');
-            
-            dbRef.push(packageData)
-                .then(() => {
-                    alert('Package added successfully');
-                    document.getElementById('packageForm').reset();
-                    bootstrap.Modal.getInstance(document.getElementById('addPackageModal')).hide();
-                    
-                    if (type === 'diamonds') {
-                        loadDiamonds();
-                    } else {
-                        loadUC();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error adding package:', error);
-                    alert('Failed to add package');
-                });
+        accountsLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('accounts');
         });
         
-        // Save new account
-        document.getElementById('saveAccountBtn').addEventListener('click', function() {
-            const game = document.getElementById('accountGame').value;
-            const name = document.getElementById('accountName').value;
-            const level = document.getElementById('accountLevel').value;
-            const priceUsd = document.getElementById('accountPriceUsd').value;
-            const priceAfn = document.getElementById('accountPriceAfn').value;
-            const description = document.getElementById('accountDescription').value;
+        notificationsLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('notifications');
+        });
+        
+        diamondsLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('diamonds');
+        });
+        
+        usersLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showSection('users');
+        });
+        
+        logoutLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            }).catch((error) => {
+                alert(`د وتلو کې ستونزه: ${error.message}`);
+            });
+        });
+        
+        addAccountBtn.addEventListener('click', () => {
+            currentEditId = null;
+            document.getElementById('admin-account-name').value = '';
+            document.getElementById('admin-account-level').value = '';
+            document.getElementById('admin-account-price').value = '';
+            document.getElementById('admin-account-details').value = '';
+            document.getElementById('admin-account-image').value = '';
+            document.getElementById('admin-account-status').value = 'active';
+            accountModal.style.display = 'block';
+        });
+        
+        addNotificationBtn.addEventListener('click', () => {
+            document.getElementById('notification-title').value = '';
+            document.getElementById('notification-content').value = '';
+            document.getElementById('notification-image').value = '';
+            notificationModal.style.display = 'block';
+        });
+        
+        addDiamondBtn.addEventListener('click', () => {
+            currentEditId = null;
+            document.getElementById('diamond-amount').value = '';
+            document.getElementById('diamond-price').value = '';
+            diamondModal.style.display = 'block';
+        });
+        
+        closeAccountModal.addEventListener('click', () => {
+            accountModal.style.display = 'none';
+        });
+        
+        closeNotificationModal.addEventListener('click', () => {
+            notificationModal.style.display = 'none';
+        });
+        
+        closeDiamondModal.addEventListener('click', () => {
+            diamondModal.style.display = 'none';
+        });
+        
+        window.addEventListener('click', (e) => {
+            if (e.target === accountModal) {
+                accountModal.style.display = 'none';
+            }
+            if (e.target === notificationModal) {
+                notificationModal.style.display = 'none';
+            }
+            if (e.target === diamondModal) {
+                diamondModal.style.display = 'none';
+            }
+        });
+        
+        submitAdminAccountBtn.addEventListener('click', () => {
+            const name = document.getElementById('admin-account-name').value;
+            const level = document.getElementById('admin-account-level').value;
+            const price = document.getElementById('admin-account-price').value;
+            const details = document.getElementById('admin-account-details').value;
+            const status = document.getElementById('admin-account-status').value;
+            const imageFile = document.getElementById('admin-account-image').files[0];
             
-            if (!name || !level || !priceUsd || !priceAfn) {
-                alert('Please fill all required fields');
+            if (!name || !level || !price || !details) {
+                alert('مهرباني وکړئ ټول اړین معلومات ولیکئ');
                 return;
             }
-            
-            // In a real app, you would upload images to Firebase Storage
-            // For this example, we'll just use placeholder URLs
-            const images = [
-                'https://via.placeholder.com/300',
-                'https://via.placeholder.com/300',
-                'https://via.placeholder.com/300',
-                'https://via.placeholder.com/300'
-            ];
             
             const accountData = {
-                game: game,
                 name: name,
-                level: parseInt(level),
-                priceUsd: parseFloat(priceUsd),
-                priceAfn: parseInt(priceAfn),
-                description: description,
-                images: images
+                level: level,
+                price: price,
+                details: details,
+                status: status,
+                sellerId: currentAdmin.uid,
+                sellerUsername: 'اډمین',
+                sellerPhone: '93787158418',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };
             
-            database.ref('items').push(accountData)
-                .then(() => {
-                    alert('Account added successfully');
-                    document.getElementById('accountForm').reset();
-                    document.getElementById('imagePreviews').innerHTML = '';
-                    bootstrap.Modal.getInstance(document.getElementById('addAccountModal')).hide();
-                    loadAccounts();
-                })
-                .catch(error => {
-                    console.error('Error adding account:', error);
-                    alert('Failed to add account');
-                });
-        });
-        
-        // Image preview for new account
-        document.getElementById('accountImages').addEventListener('change', function(e) {
-            const files = e.target.files;
-            const previewContainer = document.getElementById('imagePreviews');
-            previewContainer.innerHTML = '';
-            
-            for (let i = 0; i < Math.min(files.length, 4); i++) {
-                const file = files[i];
-                if (!file.type.match('image.*')) continue;
+            if (imageFile) {
+                // Upload image to Firebase Storage
+                const storageRef = storage.ref(`account_images/${currentAdmin.uid}/${Date.now()}_${imageFile.name}`);
+                const uploadTask = storageRef.put(imageFile);
                 
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.className = 'image-preview';
-                    previewContainer.appendChild(img);
-                };
-                reader.readAsDataURL(file);
+                uploadTask.on('state_changed', 
+                    (snapshot) => {
+                        // Progress monitoring can be added here
+                    }, 
+                    (error) => {
+                        alert(`د عکس اپلوډ کې ستونزه: ${error.message}`);
+                    }, 
+                    () => {
+                        // Get download URL
+                        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                            accountData.imageUrl = downloadURL;
+                            saveAccount(accountData);
+                        });
+                    }
+                );
+            } else {
+                if (!currentEditId) {
+                    alert('مهرباني وکړئ د اکاونټ لپاره عکس انتخاب کړئ');
+                    return;
+                }
+                saveAccount(accountData);
             }
         });
         
-        // Image preview for edit account
-        document.getElementById('editAccountImages').addEventListener('change', function(e) {
-            const files = e.target.files;
-            const previewContainer = document.getElementById('editImagePreviews');
-            previewContainer.innerHTML = '';
+        submitNotificationBtn.addEventListener('click', () => {
+            const title = document.getElementById('notification-title').value;
+            const content = document.getElementById('notification-content').value;
+            const imageFile = document.getElementById('notification-image').files[0];
             
-            for (let i = 0; i < Math.min(files.length, 4); i++) {
-                const file = files[i];
-                if (!file.type.match('image.*')) continue;
+            if (!title || !content) {
+                alert('مهرباني وکړئ سرلیک او محتوا ولیکئ');
+                return;
+            }
+            
+            const notificationData = {
+                title: title,
+                content: content,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            if (imageFile) {
+                // Upload image to Firebase Storage
+                const storageRef = storage.ref(`notification_images/${currentAdmin.uid}/${Date.now()}_${imageFile.name}`);
+                const uploadTask = storageRef.put(imageFile);
                 
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.className = 'image-preview';
-                    previewContainer.appendChild(img);
-                };
-                reader.readAsDataURL(file);
+                uploadTask.on('state_changed', 
+                    (snapshot) => {
+                        // Progress monitoring can be added here
+                    }, 
+                    (error) => {
+                        alert(`د عکس اپلوډ کې ستونزه: ${error.message}`);
+                    }, 
+                    () => {
+                        // Get download URL
+                        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                            notificationData.image = downloadURL;
+                            saveNotification(notificationData);
+                        });
+                    }
+                );
+            } else {
+                saveNotification(notificationData);
             }
         });
         
-        // View order details
-        function viewOrder(orderId, orderData = null) {
-            if (!orderData) {
-                database.ref('orders/' + orderId).once('value')
-                    .then(snapshot => {
-                        viewOrder(orderId, snapshot.val());
+        submitDiamondBtn.addEventListener('click', () => {
+            const amount = document.getElementById('diamond-amount').value;
+            const price = document.getElementById('diamond-price').value;
+            
+            if (!amount || !price) {
+                alert('مهرباني وکړئ مقدار او قیمت ولیکئ');
+                return;
+            }
+            
+            const diamondData = {
+                amount: amount,
+                price: price,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            if (currentEditId) {
+                // Update existing diamond
+                db.collection('diamonds').doc(currentEditId).update(diamondData)
+                    .then(() => {
+                        alert('الماس په بریالیتوب سره تازه شو!');
+                        diamondModal.style.display = 'none';
+                        loadDiamonds();
+                    })
+                    .catch((error) => {
+                        alert(`د الماس تازه کولو کې ستونزه: ${error.message}`);
                     });
-                return;
-            }
-            
-            document.getElementById('orderIdText').textContent = orderId;
-            document.getElementById('orderUser').textContent = orderData.email;
-            document.getElementById('orderType').textContent = orderData.type === 'diamonds' ? 'Free Fire Diamonds' : 'PUBG UC';
-            document.getElementById('orderAmount').textContent = orderData.amount;
-            document.getElementById('orderPrice').textContent = `$${orderData.priceUsd} / ${orderData.priceAfn} AFN`;
-            document.getElementById('orderStatus').textContent = orderData.status;
-            document.getElementById('orderDate').textContent = new Date(orderData.timestamp).toLocaleString();
-            
-            const actionButtons = document.getElementById('orderActionButtons');
-            actionButtons.innerHTML = '';
-            
-            if (orderData.status === 'pending') {
-                const completeBtn = document.createElement('button');
-                completeBtn.className = 'btn btn-success me-2';
-                completeBtn.textContent = 'Mark as Completed';
-                completeBtn.addEventListener('click', () => updateOrderStatus(orderId, 'completed'));
-                actionButtons.appendChild(completeBtn);
-                
-                const cancelBtn = document.createElement('button');
-                cancelBtn.className = 'btn btn-danger';
-                cancelBtn.textContent = 'Cancel Order';
-                cancelBtn.addEventListener('click', () => updateOrderStatus(orderId, 'cancelled'));
-                actionButtons.appendChild(cancelBtn);
-            } else if (orderData.status === 'completed') {
-                const statusText = document.createElement('span');
-                statusText.className = 'text-success me-2';
-                statusText.textContent = 'Order completed';
-                actionButtons.appendChild(statusText);
             } else {
-                const statusText = document.createElement('span');
-                statusText.className = 'text-danger';
-                statusText.textContent = 'Order cancelled';
-                actionButtons.appendChild(statusText);
+                // Add new diamond
+                db.collection('diamonds').add(diamondData)
+                    .then(() => {
+                        alert('الماس په بریالیتوب سره اضافه شو!');
+                        diamondModal.style.display = 'none';
+                        loadDiamonds();
+                    })
+                    .catch((error) => {
+                        alert(`د الماس اضافه کولو کې ستونزه: ${error.message}`);
+                    });
             }
+        });
+        
+        // Functions
+        function showSection(section) {
+            dashboardSection.style.display = 'none';
+            accountsSection.style.display = 'none';
+            notificationsSection.style.display = 'none';
+            diamondsSection.style.display = 'none';
+            usersSection.style.display = 'none';
             
-            bootstrap.Modal.getInstance(document.getElementById('viewOrderModal') || 
-            new bootstrap.Modal(document.getElementById('viewOrderModal')).show();
+            dashboardLink.classList.remove('active');
+            accountsLink.classList.remove('active');
+            notificationsLink.classList.remove('active');
+            diamondsLink.classList.remove('active');
+            usersLink.classList.remove('active');
+            
+            switch (section) {
+                case 'dashboard':
+                    dashboardSection.style.display = 'block';
+                    dashboardLink.classList.add('active');
+                    break;
+                case 'accounts':
+                    accountsSection.style.display = 'block';
+                    accountsLink.classList.add('active');
+                    break;
+                case 'notifications':
+                    notificationsSection.style.display = 'block';
+                    notificationsLink.classList.add('active');
+                    break;
+                case 'diamonds':
+                    diamondsSection.style.display = 'block';
+                    diamondsLink.classList.add('active');
+                    break;
+                case 'users':
+                    usersSection.style.display = 'block';
+                    usersLink.classList.add('active');
+                    break;
+            }
         }
         
-        // Update order status
-        function updateOrderStatus(orderId, status) {
-            database.ref('orders/' + orderId + '/status').set(status)
+        function saveAccount(accountData) {
+            if (currentEditId) {
+                // Update existing account
+                db.collection('accounts').doc(currentEditId).update(accountData)
+                    .then(() => {
+                        alert('اکاونټ په بریالیتوب سره تازه شو!');
+                        accountModal.style.display = 'none';
+                        loadAccounts();
+                        loadRecentAccounts();
+                    })
+                    .catch((error) => {
+                        alert(`د اکاونټ تازه کولو کې ستونزه: ${error.message}`);
+                    });
+            } else {
+                // Add new account
+                db.collection('accounts').add(accountData)
+                    .then(() => {
+                        alert('اکاونټ په بریالیتوب سره اضافه شو!');
+                        accountModal.style.display = 'none';
+                        loadAccounts();
+                        loadRecentAccounts();
+                    })
+                    .catch((error) => {
+                        alert(`د اکاونټ اضافه کولو کې ستونزه: ${error.message}`);
+                    });
+            }
+        }
+        
+        function saveNotification(notificationData) {
+            db.collection('notifications').add(notificationData)
                 .then(() => {
-                    alert('Order status updated successfully');
-                    bootstrap.Modal.getInstance(document.getElementById('viewOrderModal')).hide();
-                    loadOrders();
-                    loadDashboardStats();
+                    alert('خبرتیا په بریالیتوب سره ولېږل شوه!');
+                    notificationModal.style.display = 'none';
+                    loadNotifications();
                 })
-                .catch(error => {
-                    console.error('Error updating order status:', error);
-                    alert('Failed to update order status');
+                .catch((error) => {
+                    alert(`د خبرتیا لیږلو کې ستونزه: ${error.message}`);
                 });
         }
         
-        // View withdrawal details
-        function viewWithdrawal(withdrawalId) {
-            database.ref('withdrawals/' + withdrawalId).once('value')
-                .then(snapshot => {
-                    const withdrawalData = snapshot.val();
+        function loadStats() {
+            // Total accounts
+            db.collection('accounts').get()
+                .then((querySnapshot) => {
+                    totalAccounts.textContent = querySnapshot.size;
                     
-                    document.getElementById('withdrawalIdText').textContent = withdrawalId;
-                    document.getElementById('withdrawalUser').textContent = withdrawalData.email;
-                    document.getElementById('withdrawalFfId').textContent = withdrawalData.ffId;
-                    document.getElementById('withdrawalAmount').textContent = withdrawalData.amount + ' diamonds';
-                    document.getElementById('withdrawalStatus').textContent = withdrawalData.status;
-                    document.getElementById('withdrawalDate').textContent = new Date(withdrawalData.timestamp).toLocaleString();
+                    let activeCount = 0;
+                    querySnapshot.forEach((doc) => {
+                        if (doc.data().status === 'active') {
+                            activeCount++;
+                        }
+                    });
+                    activeAccounts.textContent = activeCount;
+                });
+            
+            // Total users
+            db.collection('users').get()
+                .then((querySnapshot) => {
+                    totalUsers.textContent = querySnapshot.size;
+                });
+            
+            // New comments (last 24 hours)
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            
+            db.collectionGroup('comments')
+                .where('createdAt', '>=', yesterday)
+                .get()
+                .then((querySnapshot) => {
+                    newComments.textContent = querySnapshot.size;
+                });
+        }
+        
+        function loadRecentAccounts() {
+            recentAccounts.innerHTML = '<tr><td colspan="5">بار کېږي...</td></tr>';
+            
+            db.collection('accounts')
+                .orderBy('createdAt', 'desc')
+                .limit(5)
+                .get()
+                .then((querySnapshot) => {
+                    recentAccounts.innerHTML = '';
                     
-                    const actionButtons = document.getElementById('withdrawalActionButtons');
-                    actionButtons.innerHTML = '';
+                    if (querySnapshot.empty) {
+                        recentAccounts.innerHTML = '<tr><td colspan="5">هیڅ اکاونټ نشته</td></tr>';
+                        return;
+                    }
                     
-                    if (withdrawalData.status === 'pending') {
-                        const completeBtn = document.createElement('button');
-                        completeBtn.className = 'btn btn-success me-2';
-                        completeBtn.textContent = 'Mark as Completed';
-                        completeBtn.addEventListener('click', () => processWithdrawal(withdrawalId, 'completed'));
-                        actionButtons.appendChild(completeBtn);
+                    querySnapshot.forEach((doc) => {
+                        const account = doc.data();
+                        const accountId = doc.id;
                         
-                        const cancelBtn = document.createElement('button');
-                        cancelBtn.className = 'btn btn-danger';
-                        cancelBtn.textContent = 'Cancel Withdrawal';
-                        cancelBtn.addEventListener('click', () => processWithdrawal(withdrawalId, 'cancelled'));
-                        actionButtons.appendChild(cancelBtn);
-                    } else if (withdrawalData.status === 'completed') {
-                        const statusText = document.createElement('span');
-                        statusText.className = 'text-success me-2';
-                        statusText.textContent = 'Withdrawal completed';
-                        actionButtons.appendChild(statusText);
-                    } else {
-                        const statusText = document.createElement('span');
-                        statusText.className = 'text-danger';
-                        statusText.textContent = 'Withdrawal cancelled';
-                        actionButtons.appendChild(statusText);
-                    }
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${account.name}</td>
+                            <td>${account.level}</td>
+                            <td>${account.price} افغانۍ</td>
+                            <td><span class="${account.status === 'active' ? 'status-active' : 'status-inactive'}">${account.status === 'active' ? 'فعال' : 'غیر فعال'}</span></td>
+                            <td>
+                                <button class="action-btn edit-btn" data-id="${accountId}"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn delete-btn" data-id="${accountId}"><i class="fas fa-trash"></i></button>
+                            </td>
+                        `;
+                        
+                        recentAccounts.appendChild(row);
+                    });
                     
-                    bootstrap.Modal.getInstance(document.getElementById('viewWithdrawalModal') || 
-                    new bootstrap.Modal(document.getElementById('viewWithdrawalModal'))).show();
-                });
-        }
-        
-        // Process withdrawal
-        function processWithdrawal(withdrawalId, status, event = null) {
-            if (event) event.stopPropagation();
-            
-            database.ref('withdrawals/' + withdrawalId + '/status').set(status)
-                .then(() => {
-                    alert('Withdrawal status updated successfully');
-                    if (!event) {
-                        bootstrap.Modal.getInstance(document.getElementById('viewWithdrawalModal')).hide();
-                    }
-                    loadWithdrawals();
-                    loadDashboardStats();
+                    // Add event listeners to action buttons
+                    addAccountActionListeners();
                 })
-                .catch(error => {
-                    console.error('Error updating withdrawal status:', error);
-                    alert('Failed to update withdrawal status');
+                .catch((error) => {
+                    recentAccounts.innerHTML = '<tr><td colspan="5">د اکاونټونو لیست بار کولو کې ستونزه</td></tr>';
+                    console.error('Error loading recent accounts:', error);
                 });
         }
         
-        // View user details
-        function viewUser(userId) {
-            database.ref('users/' + userId).once('value')
-                .then(snapshot => {
-                    const userData = snapshot.val();
+        function loadAccounts() {
+            allAccounts.innerHTML = '<tr><td colspan="7">بار کېږي...</td></tr>';
+            
+            db.collection('accounts')
+                .orderBy('createdAt', 'desc')
+                .get()
+                .then((querySnapshot) => {
+                    allAccounts.innerHTML = '';
                     
-                    document.getElementById('userIdText').textContent = userId;
-                    document.getElementById('userEmail').textContent = userData.email;
-                    document.getElementById('userRefCode').textContent = userData.referralCode || 'N/A';
-                    document.getElementById('userBalance').textContent = (userData.balance || 0) + ' diamonds';
+                    if (querySnapshot.empty) {
+                        allAccounts.innerHTML = '<tr><td colspan="7">هیڅ اکاونټ نشته</td></tr>';
+                        return;
+                    }
                     
-                    const referrals = userData.referrals ? Object.keys(userData.referrals).length : 0;
-                    document.getElementById('userReferrals').textContent = referrals;
+                    querySnapshot.forEach((doc) => {
+                        const account = doc.data();
+                        const accountId = doc.id;
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${account.name}</td>
+                            <td>${account.level}</td>
+                            <td>${account.price} افغانۍ</td>
+                            <td>${account.sellerUsername}</td>
+                            <td>${account.createdAt?.toDate().toLocaleDateString() || 'نشته'}</td>
+                            <td><span class="${account.status === 'active' ? 'status-active' : 'status-inactive'}">${account.status === 'active' ? 'فعال' : 'غیر فعال'}</span></td>
+                            <td>
+                                <button class="action-btn edit-btn" data-id="${accountId}"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn delete-btn" data-id="${accountId}"><i class="fas fa-trash"></i></button>
+                            </td>
+                        `;
+                        
+                        allAccounts.appendChild(row);
+                    });
                     
-                    document.getElementById('userJoined').textContent = new Date(userData.createdAt).toLocaleString();
-                    
-                    // Store user ID for balance editing
-                    document.getElementById('balanceUserId').value = userId;
-                    document.getElementById('newBalance').value = userData.balance || 0;
-                    
-                    bootstrap.Modal.getInstance(document.getElementById('viewUserModal') || 
-                    new bootstrap.Modal(document.getElementById('viewUserModal'))).show();
+                    // Add event listeners to action buttons
+                    addAccountActionListeners();
+                })
+                .catch((error) => {
+                    allAccounts.innerHTML = '<tr><td colspan="7">د اکاونټونو لیست بار کولو کې ستونزه</td></tr>';
+                    console.error('Error loading accounts:', error);
                 });
         }
         
-        // Edit user balance
-        document.getElementById('editUserBalanceBtn').addEventListener('click', function() {
-            bootstrap.Modal.getInstance(document.getElementById('viewUserModal')).hide();
-            bootstrap.Modal.getInstance(document.getElementById('editBalanceModal') || 
-            new bootstrap.Modal(document.getElementById('editBalanceModal'))).show();
-        });
+        function loadNotifications() {
+            notificationsList.innerHTML = '<tr><td colspan="4">بار کېږي...</td></tr>';
+            
+            db.collection('notifications')
+                .orderBy('createdAt', 'desc')
+                .get()
+                .then((querySnapshot) => {
+                    notificationsList.innerHTML = '';
+                    
+                    if (querySnapshot.empty) {
+                        notificationsList.innerHTML = '<tr><td colspan="4">هیڅ خبرتیا نشته</td></tr>';
+                        return;
+                    }
+                    
+                    querySnapshot.forEach((doc) => {
+                        const notification = doc.data();
+                        const notificationId = doc.id;
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${notification.title}</td>
+                            <td>${notification.content.substring(0, 50)}${notification.content.length > 50 ? '...' : ''}</td>
+                            <td>${notification.createdAt?.toDate().toLocaleDateString() || 'نشته'}</td>
+                            <td>
+                                <button class="action-btn delete-btn" data-id="${notificationId}"><i class="fas fa-trash"></i></button>
+                            </td>
+                        `;
+                        
+                        notificationsList.appendChild(row);
+                    });
+                    
+                    // Add event listeners to delete buttons
+                    document.querySelectorAll('#notifications-list .delete-btn').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            const notificationId = e.target.closest('button').getAttribute('data-id');
+                            if (confirm('آیا تاسو ډاډه یاست چې دا خبرتیا حذف کړئ؟')) {
+                                db.collection('notifications').doc(notificationId).delete()
+                                    .then(() => {
+                                        alert('خبرتیا په بریالیتوب سره حذف شوه!');
+                                        loadNotifications();
+                                    })
+                                    .catch((error) => {
+                                        alert(`د خبرتیا حذف کولو کې ستونزه: ${error.message}`);
+                                    });
+                            }
+                        });
+                    });
+                })
+                .catch((error) => {
+                    notificationsList.innerHTML = '<tr><td colspan="4">د خبرتیاوو لیست بار کولو کې ستونزه</td></tr>';
+                    console.error('Error loading notifications:', error);
+                });
+        }
         
-        // Save user balance
-        document.getElementById('saveBalanceBtn').addEventListener('click', function() {
-            const userId = document.getElementById('balanceUserId').value;
-            const newBalance = parseInt(document.getElementById('newBalance').value);
+        function loadDiamonds() {
+            diamondsList.innerHTML = '<tr><td colspan="3">بار کېږي...</td></tr>';
             
-            if (isNaN(newBalance)) {
-                alert('Please enter a valid number');
-                return;
-            }
+            db.collection('diamonds')
+                .orderBy('amount')
+                .get()
+                .then((querySnapshot) => {
+                    diamondsList.innerHTML = '';
+                    
+                    if (querySnapshot.empty) {
+                        diamondsList.innerHTML = '<tr><td colspan="3">هیڅ الماس نشته</td></tr>';
+                        return;
+                    }
+                    
+                    querySnapshot.forEach((doc) => {
+                        const diamond = doc.data();
+                        const diamondId = doc.id;
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${diamond.amount}</td>
+                            <td>${diamond.price} افغانۍ</td>
+                            <td>
+                                <button class="action-btn edit-btn" data-id="${diamondId}"><i class="fas fa-edit"></i></button>
+                                <button class="action-btn delete-btn" data-id="${diamondId}"><i class="fas fa-trash"></i></button>
+                            </td>
+                        `;
+                        
+                        diamondsList.appendChild(row);
+                    });
+                    
+                    // Add event listeners to action buttons
+                    document.querySelectorAll('#diamonds-list .edit-btn').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            const diamondId = e.target.closest('button').getAttribute('data-id');
+                            currentEditId = diamondId;
+                            
+                            db.collection('diamonds').doc(diamondId).get()
+                                .then((doc) => {
+                                    if (doc.exists) {
+                                        const diamond = doc.data();
+                                        document.getElementById('diamond-amount').value = diamond.amount;
+                                        document.getElementById('diamond-price').value = diamond.price;
+                                        diamondModal.style.display = 'block';
+                                    }
+                                });
+                        });
+                    });
+                    
+                    document.querySelectorAll('#diamonds-list .delete-btn').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            const diamondId = e.target.closest('button').getAttribute('data-id');
+                            if (confirm('آیا تاسو ډاډه یاست چې دا الماس حذف کړئ؟')) {
+                                db.collection('diamonds').doc(diamondId).delete()
+                                    .then(() => {
+                                        alert('الماس په بریالیتوب سره حذف شو!');
+                                        loadDiamonds();
+                                    })
+                                    .catch((error) => {
+                                        alert(`د الماس حذف کولو کې ستونزه: ${error.message}`);
+                                    });
+                            }
+                        });
+                    });
+                })
+                .catch((error) => {
+                    diamondsList.innerHTML = '<tr><td colspan="3">د الماسونو لیست بار کولو کې ستونزه</td></tr>';
+                    console.error('Error loading diamonds:', error);
+                });
+        }
+        
+        function loadUsers() {
+            usersList.innerHTML = '<tr><td colspan="5">بار کېږي...</td></tr>';
             
-            database.ref('users/' + userId + '/balance').set(newBalance)
-                .then(() => {
-                    alert('User balance updated successfully');
-                    bootstrap.Modal.getInstance(document.getElementById('editBalanceModal')).hide();
+            db.collection('users')
+                .orderBy('createdAt', 'desc')
+                .get()
+                .then((querySnapshot) => {
+                    usersList.innerHTML = '';
+                    
+                    if (querySnapshot.empty) {
+                        usersList.innerHTML = '<tr><td colspan="5">هیڅ کارونکی نشته</td></tr>';
+                        return;
+                    }
+                    
+                    querySnapshot.forEach((doc) => {
+                        const user = doc.data();
+                        const userId = doc.id;
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${user.username}</td>
+                            <td>${user.email}</td>
+                            <td>${user.phone || 'نشته'}</td>
+                            <td>${user.createdAt?.toDate().toLocaleDateString() || 'نشته'}</td>
+                            <td>
+                                <button class="action-btn delete-btn" data-id="${userId}"><i class="fas fa-trash"></i></button>
+                            </td>
+                        `;
+                        
+                        usersList.appendChild(row);
+                    });
+                    
+                    // Add event listeners to delete buttons
+                    document.querySelectorAll('#users-list .delete-btn').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            const userId = e.target.closest('button').getAttribute('data-id');
+                            if (confirm('آیا تاسو ډاډه یاست چې دا کارونکی حذف کړئ؟')) {
+                                db.collection('users').doc(userId).delete()
+                                    .then(() => {
+                                        alert('کارونکی په بریالیتوب سره حذف شو!');
+                                        loadUsers();
+                                    })
+                                    .catch((error) => {
+                                        alert(`د کارونکي حذف کولو کې ستونزه: ${error.message}`);
+                                    });
+                            }
+                        });
+                    });
+                })
+                .catch((error) => {
+                    usersList.innerHTML = '<tr><td colspan="5">د کارونکو لیست بار کولو کې ستونزه</td></tr>';
+                    console.error('Error loading users:', error);
+                });
+        }
+        
+        function addAccountActionListeners() {
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const accountId = e.target.closest('button').getAttribute('data-id');
+                    currentEditId = accountId;
+                    
+                    db.collection('accounts').doc(accountId).get()
+                        .then((doc) => {
+                            if (doc.exists) {
+                                const account = doc.data();
+                                document.getElementById('admin-account-name').value = account.name;
+                                document.getElementById('admin-account-level').value = account.level;
+                                document.getElementById('admin-account-price').value = account.price;
+                                document.getElementById('admin-account-details').value = account.details;
+                                document.getElementById('admin-account-status').value = account.status;
+                                accountModal.style.display = 'block';
+                            }
+                        });
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const accountId = e.target.closest('button').getAttribute('data-id');
+                    if (confirm('آیا تاسو ډاډه یاست چې دا اکاونټ حذف کړئ؟')) {
+                        db.collection('accounts').doc(accountId).delete()
+                            .then(() => {
+                                alert('اکاونټ په بریالیتوب سره حذف شو!');
+                                loadAccounts();
+                                loadRecentAccounts();
+                            })
+                            .catch((error) => {
+                                alert(`د اکاونټ حذف کولو کې ستونزه: ${error.message}`);
+                            });
+                    }
+                });
+            });
+        }
+        
+        // Initialize the app
+        function initApp() {
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    currentAdmin = user;
+                    
+                    // Get admin info from Firestore
+                    db.collection('users').doc(user.uid).get()
+                        .then((doc) => {
+                            if (doc.exists) {
+                                const userData = doc.data();
+                                adminUsername.textContent = userData.username;
+                                // adminImage.src = userData.profileImage || 'https://via.placeholder.com/40';
+                            }
+                        });
+                    
+                    // Load all data
+                    loadStats();
+                    loadRecentAccounts();
+                    loadAccounts();
+                    loadNotifications();
+                    loadDiamonds();
                     loadUsers();
-                })
-                .catch(error => {
-                    console.error('Error updating user balance:', error);
-                    alert('Failed to update user balance');
-                });
-        });
-        
-        // Edit package
-        function editPackage(db, packageId, amount, priceUsd, priceAfn) {
-            document.getElementById('editPackageId').value = packageId;
-            document.getElementById('editPackageDb').value = db;
-            document.getElementById('editPackageAmount').value = amount;
-            document.getElementById('editPackagePriceUsd').value = priceUsd;
-            document.getElementById('editPackagePriceAfn').value = priceAfn;
-            
-            bootstrap.Modal.getInstance(document.getElementById('editPackageModal') || 
-            new bootstrap.Modal(document.getElementById('editPackageModal'))).show();
-        }
-        
-        // Update package
-        document.getElementById('updatePackageBtn').addEventListener('click', function() {
-            const packageId = document.getElementById('editPackageId').value;
-            const db = document.getElementById('editPackageDb').value;
-            const amount = document.getElementById('editPackageAmount').value;
-            const priceUsd = document.getElementById('editPackagePriceUsd').value;
-            const priceAfn = document.getElementById('editPackagePriceAfn').value;
-            
-            if (!amount || !priceUsd || !priceAfn) {
-                alert('Please fill all fields');
-                return;
-            }
-            
-            const updates = {
-                amount: parseInt(amount),
-                priceUsd: parseFloat(priceUsd),
-                priceAfn: parseInt(priceAfn)
-            };
-            
-            database.ref(db + '/' + packageId).update(updates)
-                .then(() => {
-                    alert('Package updated successfully');
-                    bootstrap.Modal.getInstance(document.getElementById('editPackageModal')).hide();
                     
-                    if (db === 'diamonds') {
-                        loadDiamonds();
-                    } else {
-                        loadUC();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error updating package:', error);
-                    alert('Failed to update package');
-                });
-        });
-        
-        // Delete package
-        function deletePackage(db, packageId) {
-            if (!confirm('Are you sure you want to delete this package?')) return;
-            
-            database.ref(db + '/' + packageId).remove()
-                .then(() => {
-                    alert('Package deleted successfully');
-                    
-                    if (db === 'diamonds') {
-                        loadDiamonds();
-                    } else {
-                        loadUC();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error deleting package:', error);
-                    alert('Failed to delete package');
-                });
+                    // Show dashboard by default
+                    showSection('dashboard');
+                } else {
+                    // Redirect to login if not authenticated
+                    window.location.href = 'index.html';
+                }
+            });
         }
         
-        // Edit account
-        function editAccount(accountId, name, level, priceUsd, priceAfn, description, images) {
-            document.getElementById('editAccountId').value = accountId;
-            document.getElementById('editAccountName').value = name;
-            document.getElementById('editAccountLevel').value = level;
-            document.getElementById('editAccountPriceUsd').value = priceUsd;
-            document.getElementById('editAccountPriceAfn').value = priceAfn;
-            document.getElementById('editAccountDescription').value = description || '';
-            
-            // Display current images
-            const currentImagesContainer = document.getElementById('currentImages');
-            currentImagesContainer.innerHTML = '';
-            
-            if (images && images.length > 0) {
-                images.forEach(img => {
-                    const imgElement = document.createElement('img');
-                    imgElement.src = img;
-                    imgElement.className = 'image-preview';
-                    currentImagesContainer.appendChild(imgElement);
-                });
-            } else {
-                currentImagesContainer.innerHTML = '<p>No images available</p>';
-            }
-            
-            bootstrap.Modal.getInstance(document.getElementById('editAccountModal') || 
-            new bootstrap.Modal(document.getElementById('editAccountModal'))).show();
-        }
-        
-        // Update account
-        document.getElementById('updateAccountBtn').addEventListener('click', function() {
-            const accountId = document.getElementById('editAccountId').value;
-            const name = document.getElementById('editAccountName').value;
-            const level = document.getElementById('editAccountLevel').value;
-            const priceUsd = document.getElementById('editAccountPriceUsd').value;
-            const priceAfn = document.getElementById('editAccountPriceAfn').value;
-            const description = document.getElementById('editAccountDescription').value;
-            
-            if (!name || !level || !priceUsd || !priceAfn) {
-                alert('Please fill all required fields');
-                return;
-            }
-            
-            const updates = {
-                name: name,
-                level: parseInt(level),
-                priceUsd: parseFloat(priceUsd),
-                priceAfn: parseInt(priceAfn),
-                description: description
-            };
-            
-            // In a real app, you would handle image uploads here
-            // For this example, we'll just update the other fields
-            
-            database.ref('items/' + accountId).update(updates)
-                .then(() => {
-                    alert('Account updated successfully');
-                    bootstrap.Modal.getInstance(document.getElementById('editAccountModal')).hide();
-                    loadAccounts();
-                })
-                .catch(error => {
-                    console.error('Error updating account:', error);
-                    alert('Failed to update account');
-                });
-        });
-        
-        // Delete account
-        function deleteAccount(accountId) {
-            if (!confirm('Are you sure you want to delete this account?')) return;
-            
-            database.ref('items/' + accountId).remove()
-                .then(() => {
-                    alert('Account deleted successfully');
-                    loadAccounts();
-                })
-                .catch(error => {
-                    console.error('Error deleting account:', error);
-                    alert('Failed to delete account');
-                });
-        }
-        
-        // Make functions available globally
-        window.editPackage = editPackage;
-        window.deletePackage = deletePackage;
-        window.editAccount = editAccount;
-        window.deleteAccount = deleteAccount;
-        window.viewOrder = viewOrder;
-        window.viewWithdrawal = viewWithdrawal;
-        window.processWithdrawal = processWithdrawal;
-        window.viewUser = viewUser;
+        // Start the app
+        window.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
-</html> 
+</html>  

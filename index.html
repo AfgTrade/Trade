@@ -1,458 +1,117 @@
 <!DOCTYPE html>
-<html lang="ps">
+<html lang="ps" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Fire Afghan - د فری فایر اکاونټ خرڅول</title>
-    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Free Fire Afghan - اډمین پینل</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tahoma&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #FF5722;
-            --secondary: #FF9800;
-            --dark: #212121;
-            --light: #f5f5f5;
-            --success: #4CAF50;
-        }
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Almarai', sans-serif;
-            direction: rtl;
+            font-family: 'Tahoma', sans-serif;
         }
         
         body {
-            background-color: #f9f9f9;
-            color: #333;
+            background-color: #f5f5f5;
+            padding: 20px;
         }
         
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 15px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            overflow: hidden;
         }
         
         header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background-color: #FF5722;
             color: white;
-            padding: 15px 0;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        
-        .header-content {
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         
         .logo {
-            font-size: 24px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-        }
-        
-        .logo i {
-            margin-left: 10px;
-        }
-        
-        .nav-links {
-            display: flex;
-            list-style: none;
-        }
-        
-        .nav-links li {
-            margin-left: 20px;
-        }
-        
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-        
-        .nav-links a:hover {
-            opacity: 0.8;
-        }
-        
-        .notification-icon {
-            position: relative;
-            cursor: pointer;
-        }
-        
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: red;
-            color: white;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-        }
-        
-        .main-title {
-            text-align: center;
-            margin: 30px 0;
-            color: var(--dark);
-        }
-        
-        .add-account-btn {
-            display: block;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: bold;
-            margin: 20px auto;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s;
-        }
-        
-        .add-account-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-        }
-        
-        .accounts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-        
-        .account-card {
-            background-color: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s;
-            position: relative;
-        }
-        
-        .account-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        }
-        
-        .account-image {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-        }
-        
-        .account-details {
-            padding: 15px;
-        }
-        
-        .account-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: var(--dark);
-        }
-        
-        .account-level {
-            display: inline-block;
-            background-color: var(--primary);
-            color: white;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            margin-bottom: 10px;
-        }
-        
-        .account-price {
             font-size: 20px;
             font-weight: bold;
-            color: var(--primary);
-            margin: 10px 0;
         }
         
-        .account-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 15px;
-        }
-        
-        .view-btn, .chat-btn {
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .view-btn {
-            background-color: var(--light);
-            color: var(--dark);
-            border: 1px solid #ddd;
-        }
-        
-        .chat-btn {
-            background-color: var(--success);
-            color: white;
+        .logout-btn {
+            background-color: white;
+            color: #FF5722;
             border: none;
-        }
-        
-        .view-btn:hover, .chat-btn:hover {
-            opacity: 0.8;
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            overflow-y: auto;
-        }
-        
-        .modal-content {
-            background-color: white;
-            margin: 50px auto;
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 600px;
-            width: 90%;
-            position: relative;
-        }
-        
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            font-size: 24px;
-            cursor: pointer;
-            color: #777;
-        }
-        
-        .account-modal-image {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-        
-        .modal-section {
-            margin-bottom: 15px;
-        }
-        
-        .modal-section-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: var(--dark);
-        }
-        
-        .modal-section-content {
-            background-color: var(--light);
-            padding: 10px;
+            padding: 5px 10px;
             border-radius: 5px;
-        }
-        
-        .buy-btn {
-            display: block;
-            width: 100%;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 20px;
             cursor: pointer;
-            transition: all 0.3s;
         }
         
-        .buy-btn:hover {
-            opacity: 0.9;
-        }
-        
-        .comments-section {
-            margin-top: 30px;
-        }
-        
-        .comment-form {
+        .tabs {
             display: flex;
-            margin-bottom: 20px;
+            background-color: #eee;
         }
         
-        .comment-input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px 0 0 5px;
-            outline: none;
-        }
-        
-        .comment-submit {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 0 15px;
-            border-radius: 0 5px 5px 0;
-            cursor: pointer;
-        }
-        
-        .comment {
-            background-color: white;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        
-        .comment-author {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .notification-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-        }
-        
-        .notification-content {
-            background-color: white;
-            margin: 50px auto;
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 500px;
-            width: 90%;
-            position: relative;
-        }
-        
-        .notification-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-        
-        .diamonds-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-        }
-        
-        .diamonds-content {
-            background-color: white;
-            margin: 50px auto;
-            padding: 20px;
-            border-radius: 10px;
-            max-width: 500px;
-            width: 90%;
-            position: relative;
-        }
-        
-        .diamond-option {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .diamond-option:hover {
-            background-color: #f5f5f5;
-        }
-        
-        .diamond-price {
-            color: var(--primary);
-            font-weight: bold;
-        }
-        
-        .contact-btn {
-            display: block;
-            background-color: #25D366;
-            color: white;
-            text-decoration: none;
-            text-align: center;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-        
-        .login-register-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-        }
-        
-        .login-register-content {
-            background-color: white;
-            margin: 50px auto;
-            padding: 30px;
-            border-radius: 10px;
-            max-width: 400px;
-            width: 90%;
-            position: relative;
-        }
-        
-        .auth-tabs {
-            display: flex;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        .auth-tab {
+        .tab {
             padding: 10px 20px;
             cursor: pointer;
-            text-align: center;
-            flex: 1;
         }
         
-        .auth-tab.active {
-            border-bottom: 2px solid var(--primary);
+        .tab.active {
+            background-color: white;
             font-weight: bold;
-            color: var(--primary);
         }
         
-        .auth-form {
+        .tab-content {
+            padding: 20px;
             display: none;
         }
         
-        .auth-form.active {
+        .tab-content.active {
             display: block;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 10px;
+            text-align: right;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: #f9f9f9;
+        }
+        
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
         }
         
         .form-group {
@@ -465,267 +124,176 @@
             font-weight: bold;
         }
         
-        .form-group input {
+        .form-group input, .form-group textarea {
             width: 100%;
-            padding: 10px;
+            padding: 8px;
             border: 1px solid #ddd;
-            border-radius: 5px;
+            border-radius: 4px;
         }
         
-        .auth-submit {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        .submit-btn {
+            background-color: #4CAF50;
             color: white;
             border: none;
-            padding: 12px;
-            width: 100%;
-            border-radius: 5px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .stat-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
             font-weight: bold;
-            cursor: pointer;
-            margin-top: 10px;
+            margin: 10px 0;
         }
         
-        .auth-switch {
-            text-align: center;
-            margin-top: 15px;
+        .stat-title {
             color: #777;
-            cursor: pointer;
-        }
-        
-        .auth-switch:hover {
-            color: var(--primary);
-        }
-        
-        footer {
-            background-color: var(--dark);
-            color: white;
-            padding: 30px 0;
-            margin-top: 50px;
-            text-align: center;
-        }
-        
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-            }
-            
-            .logo {
-                margin-bottom: 15px;
-            }
-            
-            .nav-links {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            
-            .nav-links li {
-                margin: 0 10px 10px;
-            }
-            
-            .accounts-grid {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="container header-content">
-            <div class="logo">
-                <i class="fas fa-fire"></i>
-                <span>Free Fire Afghan</span>
-            </div>
-            <ul class="nav-links">
-                <li><a href="#" id="diamonds-link">الماسونه</a></li>
-                <li><a href="#" id="contact-link">اړیکه</a></li>
-                <li class="notification-icon">
-                    <i class="fas fa-bell"></i>
-                    <span class="notification-badge" id="notification-badge">0</span>
-                </li>
-                <li><a href="#" id="auth-link">ننوتل / نوی حساب</a></li>
-            </ul>
-        </div>
-    </header>
-    
     <div class="container">
-        <h1 class="main-title">د فری فایر اکاونټ خرڅول او اخستل</h1>
+        <header>
+            <div class="logo">Free Fire Afghan - اډمین پینل</div>
+            <button class="logout-btn" id="logout-btn">وتل</button>
+        </header>
         
-        <button class="add-account-btn" id="add-account-btn">
-            <i class="fas fa-plus"></i> نوی فری فایر اکاونټ اضافه کړئ
-        </button>
+        <div class="tabs">
+            <div class="tab active" data-tab="dashboard">ډشبورډ</div>
+            <div class="tab" data-tab="accounts">اکاونټونه</div>
+            <div class="tab" data-tab="notifications">خبرتیاوې</div>
+            <div class="tab" data-tab="diamonds">الماسونه</div>
+        </div>
         
-        <div class="accounts-grid" id="accounts-grid">
-            <!-- Accounts will be loaded here dynamically -->
-        </div>
-    </div>
-    
-    <!-- Account Details Modal -->
-    <div class="modal" id="account-modal">
-        <div class="modal-content">
-            <span class="close-modal" id="close-modal">&times;</span>
-            <img src="" alt="Account Image" class="account-modal-image" id="modal-account-image">
-            
-            <div class="modal-section">
-                <div class="modal-section-title">د اکاونټ نوم</div>
-                <div class="modal-section-content" id="modal-account-name"></div>
-            </div>
-            
-            <div class="modal-section">
-                <div class="modal-section-title">د اکاونټ لیول</div>
-                <div class="modal-section-content" id="modal-account-level"></div>
-            </div>
-            
-            <div class="modal-section">
-                <div class="modal-section-title">د اکاونټ قیمت</div>
-                <div class="modal-section-content" id="modal-account-price"></div>
-            </div>
-            
-            <div class="modal-section">
-                <div class="modal-section-title">د پلورونکي معلومات</div>
-                <div class="modal-section-content">
-                    <div id="modal-seller-username"></div>
-                    <div id="modal-seller-phone"></div>
+        <div class="tab-content active" id="dashboard-content">
+            <div class="card">
+                <div class="card-title">احصائیه</div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div class="stat-card">
+                        <div class="stat-title">ټول اکاونټونه</div>
+                        <div class="stat-value" id="total-accounts">0</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-title">فعال اکاونټونه</div>
+                        <div class="stat-value" id="active-accounts">0</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-title">کارونکي</div>
+                        <div class="stat-value" id="total-users">0</div>
+                    </div>
                 </div>
             </div>
             
-            <div class="modal-section">
-                <div class="modal-section-title">د اکاونټ معلومات</div>
-                <div class="modal-section-content" id="modal-account-details"></div>
-            </div>
-            
-            <button class="buy-btn" id="buy-btn">
-                <i class="fas fa-shopping-cart"></i> اوس واخلئ
-            </button>
-            
-            <div class="comments-section">
-                <h3>تبصرې</h3>
-                <div class="comment-form">
-                    <input type="text" class="comment-input" id="comment-input" placeholder="خپل تبصره دلته ولیکئ...">
-                    <button class="comment-submit" id="comment-submit"><i class="fas fa-paper-plane"></i></button>
-                </div>
-                <div id="comments-container"></div>
+            <div class="card">
+                <div class="card-title">وروستي اکاونټونه</div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>نوم</th>
+                            <th>لیول</th>
+                            <th>قیمت</th>
+                            <th>عملیې</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-accounts">
+                        <!-- وروستي اکاونټونه به دلته ښکاره شي -->
+                    </tbody>
+                </table>
             </div>
         </div>
-    </div>
-    
-    <!-- Notification Modal -->
-    <div class="notification-modal" id="notification-modal">
-        <div class="notification-content">
-            <span class="close-modal" id="close-notification-modal">&times;</span>
-            <img src="" alt="Notification Image" class="notification-image" id="notification-modal-image">
-            <h2 id="notification-modal-title"></h2>
-            <p id="notification-modal-content"></p>
+        
+        <div class="tab-content" id="accounts-content">
+            <div class="card">
+                <div class="card-title">ټول اکاونټونه</div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>نوم</th>
+                            <th>لیول</th>
+                            <th>قیمت</th>
+                            <th>پلورونکی</th>
+                            <th>عملیې</th>
+                        </tr>
+                    </thead>
+                    <tbody id="all-accounts">
+                        <!-- ټول اکاونټونه به دلته ښکاره شي -->
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-    
-    <!-- Diamonds Modal -->
-    <div class="diamonds-modal" id="diamonds-modal">
-        <div class="diamonds-content">
-            <span class="close-modal" id="close-diamonds-modal">&times;</span>
-            <h2>د فری فایر الماس قیمتونه</h2>
-            <div id="diamonds-list">
-                <!-- Diamonds will be loaded here dynamically -->
+        
+        <div class="tab-content" id="notifications-content">
+            <div class="card">
+                <div class="card-title">نوې خبرتیا</div>
+                
+                <form id="notification-form">
+                    <div class="form-group">
+                        <label for="notification-title">سرلیک</label>
+                        <input type="text" id="notification-title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notification-message">پیغام</label>
+                        <textarea id="notification-message" rows="4" required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">خبرتیا واستوئ</button>
+                </form>
             </div>
-            <a href="https://wa.me/93787158418" class="contact-btn">
-                <i class="fab fa-whatsapp"></i> په واتساپ کی اړیکه ونیسئ
-            </a>
         </div>
-    </div>
-    
-    <!-- Login/Register Modal -->
-    <div class="login-register-modal" id="login-register-modal">
-        <div class="login-register-content">
-            <span class="close-modal" id="close-auth-modal">&times;</span>
-            <div class="auth-tabs">
-                <div class="auth-tab active" id="login-tab">ننوتل</div>
-                <div class="auth-tab" id="register-tab">نوی حساب</div>
-            </div>
-            
-            <div class="auth-form active" id="login-form">
-                <div class="form-group">
-                    <label for="login-email">بریښنالیک</label>
-                    <input type="email" id="login-email" placeholder="خپل بریښنالیک ولیکئ">
-                </div>
-                <div class="form-group">
-                    <label for="login-password">پاسورډ</label>
-                    <input type="password" id="login-password" placeholder="خپل پاسورډ ولیکئ">
-                </div>
-                <button class="auth-submit" id="login-submit">ننوتل</button>
-                <div class="auth-switch" id="show-register">نوی حساب جوړول غواړئ؟</div>
-            </div>
-            
-            <div class="auth-form" id="register-form">
-                <div class="form-group">
-                    <label for="register-username">د کارن نوم</label>
-                    <input type="text" id="register-username" placeholder="خپل کارن نوم ولیکئ">
-                </div>
-                <div class="form-group">
-                    <label for="register-email">بریښنالیک</label>
-                    <input type="email" id="register-email" placeholder="خپل بریښنالیک ولیکئ">
-                </div>
-                <div class="form-group">
-                    <label for="register-password">پاسورډ</label>
-                    <input type="password" id="register-password" placeholder="خپل پاسورډ ولیکئ">
-                </div>
-                <div class="form-group">
-                    <label for="register-phone">د اړیکې شمیره</label>
-                    <input type="text" id="register-phone" placeholder="خپل ټیلیفون شمیره ولیکئ">
-                </div>
-                <button class="auth-submit" id="register-submit">حساب جوړول</button>
-                <div class="auth-switch" id="show-login">دمخه حساب لرئ؟ ننوتل</div>
+        
+        <div class="tab-content" id="diamonds-content">
+            <div class="card">
+                <div class="card-title">د الماسونو قیمتونه</div>
+                
+                <form id="diamond-form">
+                    <div class="form-group">
+                        <label for="diamond-amount">مقدار</label>
+                        <input type="number" id="diamond-amount" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="diamond-price">قیمت (افغانیو کی)</label>
+                        <input type="number" id="diamond-price" required>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">ثبتول</button>
+                </form>
+                
+                <table style="margin-top: 20px;">
+                    <thead>
+                        <tr>
+                            <th>مقدار</th>
+                            <th>قیمت</th>
+                            <th>عملیې</th>
+                        </tr>
+                    </thead>
+                    <tbody id="diamonds-list">
+                        <!-- الماسونه به دلته ښکاره شي -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-    
-    <!-- Add Account Modal -->
-    <div class="modal" id="add-account-modal">
-        <div class="modal-content">
-            <span class="close-modal" id="close-add-account-modal">&times;</span>
-            <h2>نوی فری فایر اکاونټ اضافه کړئ</h2>
-            
-            <div class="form-group">
-                <label for="account-name">د اکاونټ نوم</label>
-                <input type="text" id="account-name" placeholder="د اکاونټ نوم ولیکئ">
-            </div>
-            
-            <div class="form-group">
-                <label for="account-level">د اکاونټ لیول</label>
-                <input type="number" id="account-level" placeholder="د اکاونټ لیول ولیکئ">
-            </div>
-            
-            <div class="form-group">
-                <label for="account-price">قیمت (افغانیو کی)</label>
-                <input type="number" id="account-price" placeholder="د اکاونټ قیمت افغانیو کی ولیکئ">
-            </div>
-            
-            <div class="form-group">
-                <label for="account-details">د اکاونټ معلومات</label>
-                <textarea id="account-details" rows="4" placeholder="د اکاونټ نور معلومات دلته ولیکئ"></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label for="account-image">د اکاونټ عکس</label>
-                <input type="file" id="account-image" accept="image/*">
-            </div>
-            
-            <button class="buy-btn" id="submit-account-btn">
-                <i class="fas fa-plus"></i> اکاونټ پوسټ کړئ
-            </button>
-        </div>
-    </div>
-    
-    <footer>
-        <div class="container">
-            <p>© 2023 Free Fire Afghan - ټول حقونه خوندي دي</p>
-            <p>د فری فایر اکاونټ خرڅول او اخستل</p>
-        </div>
-    </footer>
-    
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     
     <script>
         // Firebase configuration
@@ -743,525 +311,251 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-        const storage = firebase.storage();
-        const realtimeDb = firebase.database();
         
         // DOM Elements
-        const accountsGrid = document.getElementById('accounts-grid');
-        const accountModal = document.getElementById('account-modal');
-        const closeModal = document.getElementById('close-modal');
-        const modalAccountImage = document.getElementById('modal-account-image');
-        const modalAccountName = document.getElementById('modal-account-name');
-        const modalAccountLevel = document.getElementById('modal-account-level');
-        const modalAccountPrice = document.getElementById('modal-account-price');
-        const modalSellerUsername = document.getElementById('modal-seller-username');
-        const modalSellerPhone = document.getElementById('modal-seller-phone');
-        const modalAccountDetails = document.getElementById('modal-account-details');
-        const buyBtn = document.getElementById('buy-btn');
-        const commentInput = document.getElementById('comment-input');
-        const commentSubmit = document.getElementById('comment-submit');
-        const commentsContainer = document.getElementById('comments-container');
-        const notificationModal = document.getElementById('notification-modal');
-        const closeNotificationModal = document.getElementById('close-notification-modal');
-        const notificationModalImage = document.getElementById('notification-modal-image');
-        const notificationModalTitle = document.getElementById('notification-modal-title');
-        const notificationModalContent = document.getElementById('notification-modal-content');
-        const notificationBadge = document.getElementById('notification-badge');
-        const notificationIcon = document.querySelector('.notification-icon');
-        const diamondsModal = document.getElementById('diamonds-modal');
-        const closeDiamondsModal = document.getElementById('close-diamonds-modal');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const logoutBtn = document.getElementById('logout-btn');
+        
+        // Stats
+        const totalAccountsEl = document.getElementById('total-accounts');
+        const activeAccountsEl = document.getElementById('active-accounts');
+        const totalUsersEl = document.getElementById('total-users');
+        
+        // Accounts
+        const recentAccountsEl = document.getElementById('recent-accounts');
+        const allAccountsEl = document.getElementById('all-accounts');
+        
+        // Notifications
+        const notificationForm = document.getElementById('notification-form');
+        const notificationTitle = document.getElementById('notification-title');
+        const notificationMessage = document.getElementById('notification-message');
+        
+        // Diamonds
+        const diamondForm = document.getElementById('diamond-form');
+        const diamondAmount = document.getElementById('diamond-amount');
+        const diamondPrice = document.getElementById('diamond-price');
         const diamondsList = document.getElementById('diamonds-list');
-        const diamondsLink = document.getElementById('diamonds-link');
-        const contactLink = document.getElementById('contact-link');
-        const loginRegisterModal = document.getElementById('login-register-modal');
-        const closeAuthModal = document.getElementById('close-auth-modal');
-        const loginTab = document.getElementById('login-tab');
-        const registerTab = document.getElementById('register-tab');
-        const loginForm = document.getElementById('login-form');
-        const registerForm = document.getElementById('register-form');
-        const loginSubmit = document.getElementById('login-submit');
-        const registerSubmit = document.getElementById('register-submit');
-        const showRegister = document.getElementById('show-register');
-        const showLogin = document.getElementById('show-login');
-        const authLink = document.getElementById('auth-link');
-        const addAccountBtn = document.getElementById('add-account-btn');
-        const addAccountModal = document.getElementById('add-account-modal');
-        const closeAddAccountModal = document.getElementById('close-add-account-modal');
-        const submitAccountBtn = document.getElementById('submit-account-btn');
         
-        // Global variables
-        let currentUser = null;
-        let currentAccountId = null;
-        let notifications = [];
-        let diamonds = [];
-        
-        // Event Listeners
-        closeModal.addEventListener('click', () => {
-            accountModal.style.display = 'none';
-        });
-        
-        closeNotificationModal.addEventListener('click', () => {
-            notificationModal.style.display = 'none';
-        });
-        
-        closeDiamondsModal.addEventListener('click', () => {
-            diamondsModal.style.display = 'none';
-        });
-        
-        closeAuthModal.addEventListener('click', () => {
-            loginRegisterModal.style.display = 'none';
-        });
-        
-        closeAddAccountModal.addEventListener('click', () => {
-            addAccountModal.style.display = 'none';
-        });
-        
-        window.addEventListener('click', (e) => {
-            if (e.target === accountModal) {
-                accountModal.style.display = 'none';
-            }
-            if (e.target === notificationModal) {
-                notificationModal.style.display = 'none';
-            }
-            if (e.target === diamondsModal) {
-                diamondsModal.style.display = 'none';
-            }
-            if (e.target === loginRegisterModal) {
-                loginRegisterModal.style.display = 'none';
-            }
-            if (e.target === addAccountModal) {
-                addAccountModal.style.display = 'none';
-            }
-        });
-        
-        notificationIcon.addEventListener('click', () => {
-            if (notifications.length > 0) {
-                const latestNotification = notifications[0];
-                notificationModalImage.src = latestNotification.image || 'https://via.placeholder.com/500x300?text=Free+Fire+Afghan';
-                notificationModalTitle.textContent = latestNotification.title;
-                notificationModalContent.textContent = latestNotification.content;
-                notificationModal.style.display = 'block';
+        // Tab switching
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
                 
-                // Mark as read
-                notificationBadge.textContent = notifications.length - 1;
-                if (notifications.length - 1 === 0) {
-                    notificationBadge.style.display = 'none';
-                }
-            }
+                tab.classList.add('active');
+                document.getElementById(`${tab.dataset.tab}-content`).classList.add('active');
+            });
         });
         
-        diamondsLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            diamondsModal.style.display = 'block';
+        // Logout
+        logoutBtn.addEventListener('click', () => {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            });
         });
         
-        contactLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.open('https://wa.me/93787158418', '_blank');
-        });
-        
-        loginTab.addEventListener('click', () => {
-            loginTab.classList.add('active');
-            registerTab.classList.remove('active');
-            loginForm.classList.add('active');
-            registerForm.classList.remove('active');
-        });
-        
-        registerTab.addEventListener('click', () => {
-            registerTab.classList.add('active');
-            loginTab.classList.remove('active');
-            registerForm.classList.add('active');
-            loginForm.classList.remove('active');
-        });
-        
-        showRegister.addEventListener('click', () => {
-            registerTab.click();
-        });
-        
-        showLogin.addEventListener('click', () => {
-            loginTab.click();
-        });
-        
-        authLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            loginRegisterModal.style.display = 'block';
-        });
-        
-        addAccountBtn.addEventListener('click', () => {
-            if (currentUser) {
-                addAccountModal.style.display = 'block';
-            } else {
-                loginRegisterModal.style.display = 'block';
-            }
-        });
-        
-        // Form Submissions
-        loginSubmit.addEventListener('click', () => {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            
-            auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    currentUser = userCredential.user;
-                    loginRegisterModal.style.display = 'none';
-                    updateUIForAuth();
-                })
-                .catch((error) => {
-                    alert(`د ننوتلو کې ستونزه: ${error.message}`);
-                });
-        });
-        
-        registerSubmit.addEventListener('click', () => {
-            const username = document.getElementById('register-username').value;
-            const email = document.getElementById('register-email').value;
-            const password = document.getElementById('register-password').value;
-            const phone = document.getElementById('register-phone').value;
-            
-            auth.createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    currentUser = userCredential.user;
-                    
-                    // Save additional user info to Firestore
-                    return db.collection('users').doc(currentUser.uid).set({
-                        username: username,
-                        email: email,
-                        phone: phone,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                })
-                .then(() => {
-                    loginRegisterModal.style.display = 'none';
-                    updateUIForAuth();
-                })
-                .catch((error) => {
-                    alert(`د حساب جوړولو کې ستونزه: ${error.message}`);
-                });
-        });
-        
-        submitAccountBtn.addEventListener('click', () => {
-            const name = document.getElementById('account-name').value;
-            const level = document.getElementById('account-level').value;
-            const price = document.getElementById('account-price').value;
-            const details = document.getElementById('account-details').value;
-            const imageFile = document.getElementById('account-image').files[0];
-            
-            if (!name || !level || !price || !details || !imageFile) {
-                alert('مهرباني وکړئ ټول معلومات ولیکئ');
-                return;
-            }
-            
-            // Upload image to Firebase Storage
-            const storageRef = storage.ref(`account_images/${currentUser.uid}/${Date.now()}_${imageFile.name}`);
-            const uploadTask = storageRef.put(imageFile);
-            
-            uploadTask.on('state_changed', 
-                (snapshot) => {
-                    // Progress monitoring can be added here
-                }, 
-                (error) => {
-                    alert(`د عکس اپلوډ کې ستونزه: ${error.message}`);
-                }, 
-                () => {
-                    // Get download URL
-                    uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-                        // Save account data to Firestore
-                        db.collection('accounts').add({
-                            name: name,
-                            level: level,
-                            price: price,
-                            details: details,
-                            imageUrl: downloadURL,
-                            sellerId: currentUser.uid,
-                            sellerUsername: currentUser.displayName || 'ناشناس',
-                            sellerPhone: currentUser.phoneNumber || 'نه دی مشخص',
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                            status: 'active'
-                        })
-                        .then(() => {
-                            alert('ستاسو اکاونټ په بریالیتوب سره پوسټ شو!');
-                            addAccountModal.style.display = 'none';
-                            // Clear form
-                            document.getElementById('account-name').value = '';
-                            document.getElementById('account-level').value = '';
-                            document.getElementById('account-price').value = '';
-                            document.getElementById('account-details').value = '';
-                            document.getElementById('account-image').value = '';
-                        })
-                        .catch((error) => {
-                            alert(`د اکاونټ پوسټ کې ستونزه: ${error.message}`);
-                        });
-                    });
-                }
-            );
-        });
-        
-        commentSubmit.addEventListener('click', () => {
-            if (!currentUser) {
-                alert('د تبصرې لپاره لومړی ننوتل ضروري دي');
-                loginRegisterModal.style.display = 'block';
-                return;
-            }
-            
-            const commentText = commentInput.value.trim();
-            if (!commentText) {
-                alert('مهرباني وکړئ یوه تبصره ولیکئ');
-                return;
-            }
-            
-            // Get username from Firestore
-            db.collection('users').doc(currentUser.uid).get()
-                .then((doc) => {
-                    const username = doc.exists ? doc.data().username : 'ناشناس';
-                    
-                    // Add comment to Firestore
-                    return db.collection('accounts').doc(currentAccountId).collection('comments').add({
-                        text: commentText,
-                        authorId: currentUser.uid,
-                        authorName: username,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                })
-                .then(() => {
-                    commentInput.value = '';
-                    loadComments(currentAccountId);
-                })
-                .catch((error) => {
-                    alert(`د تبصرې اضافه کولو کې ستونزه: ${error.message}`);
-                });
-        });
-        
-        // Functions
-        function updateUIForAuth() {
-            if (currentUser) {
-                authLink.textContent = 'ستاسو حساب';
-                addAccountBtn.style.display = 'block';
+        // Load stats
+        function loadStats() {
+            // Total accounts
+            db.collection('accounts').get().then(snap => {
+                totalAccountsEl.textContent = snap.size;
                 
-                // Get user data from Firestore
-                db.collection('users').doc(currentUser.uid).get()
-                    .then((doc) => {
-                        if (doc.exists) {
-                            currentUser.displayName = doc.data().username;
-                            currentUser.phoneNumber = doc.data().phone;
-                        }
-                    });
-            } else {
-                authLink.textContent = 'ننوتل / نوی حساب';
-                addAccountBtn.style.display = 'none';
-            }
+                let active = 0;
+                snap.forEach(doc => {
+                    if (doc.data().status === 'active') active++;
+                });
+                activeAccountsEl.textContent = active;
+            });
+            
+            // Total users
+            db.collection('users').get().then(snap => {
+                totalUsersEl.textContent = snap.size;
+            });
         }
         
-        function loadAccounts() {
-            accountsGrid.innerHTML = '<p>د اکاونټونو لیست بار کېږي...</p>';
+        // Load recent accounts
+        function loadRecentAccounts() {
+            recentAccountsEl.innerHTML = '';
             
             db.collection('accounts')
-                .where('status', '==', 'active')
-                .orderBy('createdAt', 'desc')
-                .limit(24) // Only show 24 accounts per day
-                .get()
-                .then((querySnapshot) => {
-                    accountsGrid.innerHTML = '';
-                    
-                    if (querySnapshot.empty) {
-                        accountsGrid.innerHTML = '<p>اوس مهال هیڅ اکاونټ نشته</p>';
-                        return;
-                    }
-                    
-                    querySnapshot.forEach((doc) => {
-                        const account = doc.data();
-                        const accountId = doc.id;
-                        
-                        const accountCard = document.createElement('div');
-                        accountCard.className = 'account-card';
-                        accountCard.innerHTML = `
-                            <img src="${account.imageUrl}" alt="${account.name}" class="account-image">
-                            <div class="account-details">
-                                <h3 class="account-title">${account.name}</h3>
-                                <span class="account-level">لیول ${account.level}</span>
-                                <div class="account-price">${account.price} افغانۍ</div>
-                                <div class="account-actions">
-                                    <button class="view-btn" data-id="${accountId}">لیدل</button>
-                                    <button class="chat-btn" data-id="${accountId}">چټ</button>
-                                </div>
-                            </div>
-                        `;
-                        
-                        accountsGrid.appendChild(accountCard);
-                    });
-                    
-                    // Add event listeners to view buttons
-                    document.querySelectorAll('.view-btn').forEach(button => {
-                        button.addEventListener('click', (e) => {
-                            const accountId = e.target.getAttribute('data-id');
-                            viewAccount(accountId);
-                        });
-                    });
-                    
-                    // Add event listeners to chat buttons
-                    document.querySelectorAll('.chat-btn').forEach(button => {
-                        button.addEventListener('click', (e) => {
-                            if (!currentUser) {
-                                alert('د چټ کولو لپاره لومړی ننوتل ضروري دي');
-                                loginRegisterModal.style.display = 'block';
-                                return;
-                            }
-                            
-                            const accountId = e.target.getAttribute('data-id');
-                            // In a real app, this would open a chat interface
-                            alert(`به چټ سیسټم ته ښه راغلاست! تاسو به د دې اکاونټ پلورونکي سره اړیکه ونیسئ: ${accountId}`);
-                        });
-                    });
-                })
-                .catch((error) => {
-                    accountsGrid.innerHTML = '<p>د اکاونټونو لیست بار کولو کې ستونزه</p>';
-                    console.error('Error loading accounts:', error);
-                });
-        }
-        
-        function viewAccount(accountId) {
-            currentAccountId = accountId;
-            
-            db.collection('accounts').doc(accountId).get()
-                .then((doc) => {
-                    if (!doc.exists) {
-                        alert('دا اکاونټ نشته');
-                        return;
-                    }
-                    
-                    const account = doc.data();
-                    
-                    // Display account details in modal
-                    modalAccountImage.src = account.imageUrl;
-                    modalAccountName.textContent = account.name;
-                    modalAccountLevel.textContent = `لیول ${account.level}`;
-                    modalAccountPrice.textContent = `${account.price} افغانۍ`;
-                    modalSellerUsername.textContent = `کارن نوم: ${account.sellerUsername}`;
-                    modalSellerPhone.textContent = `شمیره: ${account.sellerPhone}`;
-                    modalAccountDetails.textContent = account.details;
-                    
-                    // Set up buy button
-                    buyBtn.onclick = () => {
-                        if (!currentUser) {
-                            alert('د پیرود لپاره لومړی ننوتل ضروري دي');
-                            loginRegisterModal.style.display = 'block';
-                            return;
-                        }
-                        
-                        // In a real app, this would initiate a purchase process
-                        alert(`ستاسو د ${account.name} اکاونټ پیرود تایید شو! به ډیر ژر د پلورونکي سره اړیکه ونیسئ.`);
-                    };
-                    
-                    // Load comments
-                    loadComments(accountId);
-                    
-                    // Show modal
-                    accountModal.style.display = 'block';
-                })
-                .catch((error) => {
-                    alert(`د اکاونټ لیدلو کې ستونزه: ${error.message}`);
-                });
-        }
-        
-        function loadComments(accountId) {
-            commentsContainer.innerHTML = '<p>تبصرې بار کېږي...</p>';
-            
-            db.collection('accounts').doc(accountId).collection('comments')
-                .orderBy('createdAt', 'desc')
-                .get()
-                .then((querySnapshot) => {
-                    commentsContainer.innerHTML = '';
-                    
-                    if (querySnapshot.empty) {
-                        commentsContainer.innerHTML = '<p>هیڅ تبصره نشته</p>';
-                        return;
-                    }
-                    
-                    querySnapshot.forEach((doc) => {
-                        const comment = doc.data();
-                        
-                        const commentElement = document.createElement('div');
-                        commentElement.className = 'comment';
-                        commentElement.innerHTML = `
-                            <div class="comment-author">${comment.authorName}</div>
-                            <div>${comment.text}</div>
-                        `;
-                        
-                        commentsContainer.appendChild(commentElement);
-                    });
-                })
-                .catch((error) => {
-                    commentsContainer.innerHTML = '<p>د تبصرو بار کولو کې ستونزه</p>';
-                    console.error('Error loading comments:', error);
-                });
-        }
-        
-        function loadNotifications() {
-            db.collection('notifications')
                 .orderBy('createdAt', 'desc')
                 .limit(5)
                 .get()
-                .then((querySnapshot) => {
-                    notifications = [];
-                    querySnapshot.forEach((doc) => {
-                        notifications.push(doc.data());
+                .then(snap => {
+                    if (snap.empty) {
+                        recentAccountsEl.innerHTML = '<tr><td colspan="4">هیڅ اکاونټ نشته</td></tr>';
+                        return;
+                    }
+                    
+                    snap.forEach(doc => {
+                        const account = doc.data();
+                        recentAccountsEl.innerHTML += `
+                            <tr>
+                                <td>${account.name}</td>
+                                <td>${account.level}</td>
+                                <td>${account.price} افغانۍ</td>
+                                <td><button class="delete-btn" data-id="${doc.id}">حذف</button></td>
+                            </tr>
+                        `;
                     });
                     
-                    if (notifications.length > 0) {
-                        notificationBadge.textContent = notifications.length;
-                        notificationBadge.style.display = 'flex';
-                    } else {
-                        notificationBadge.style.display = 'none';
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error loading notifications:', error);
+                    // Add delete event listeners
+                    document.querySelectorAll('#recent-accounts .delete-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            if (confirm('آیا تاسو ډاډه یاست چې دا اکاونټ حذف کړئ؟')) {
+                                db.collection('accounts').doc(e.target.dataset.id).delete()
+                                    .then(() => {
+                                        loadRecentAccounts();
+                                        loadAllAccounts();
+                                        loadStats();
+                                    });
+                            }
+                        });
+                    });
                 });
         }
         
+        // Load all accounts
+        function loadAllAccounts() {
+            allAccountsEl.innerHTML = '';
+            
+            db.collection('accounts')
+                .orderBy('createdAt', 'desc')
+                .get()
+                .then(snap => {
+                    if (snap.empty) {
+                        allAccountsEl.innerHTML = '<tr><td colspan="5">هیڅ اکاونټ نشته</td></tr>';
+                        return;
+                    }
+                    
+                    snap.forEach(doc => {
+                        const account = doc.data();
+                        allAccountsEl.innerHTML += `
+                            <tr>
+                                <td>${account.name}</td>
+                                <td>${account.level}</td>
+                                <td>${account.price} افغانۍ</td>
+                                <td>${account.sellerUsername || 'نشته'}</td>
+                                <td><button class="delete-btn" data-id="${doc.id}">حذف</button></td>
+                            </tr>
+                        `;
+                    });
+                    
+                    // Add delete event listeners
+                    document.querySelectorAll('#all-accounts .delete-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            if (confirm('آیا تاسو ډاډه یاست چې دا اکاونټ حذف کړئ؟')) {
+                                db.collection('accounts').doc(e.target.dataset.id).delete()
+                                    .then(() => {
+                                        loadRecentAccounts();
+                                        loadAllAccounts();
+                                        loadStats();
+                                    });
+                            }
+                        });
+                    });
+                });
+        }
+        
+        // Send notification
+        notificationForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            db.collection('notifications').add({
+                title: notificationTitle.value,
+                message: notificationMessage.value,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+                alert('خبرتیا په بریالیتوب سره ولېږل شوه!');
+                notificationTitle.value = '';
+                notificationMessage.value = '';
+            })
+            .catch(error => {
+                alert(`د خبرتیا لیږلو کې ستونزه: ${error.message}`);
+            });
+        });
+        
+        // Add diamond price
+        diamondForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            db.collection('diamonds').add({
+                amount: diamondAmount.value,
+                price: diamondPrice.value,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then(() => {
+                alert('د الماس قیمت په بریالیتوب سره ثبت شو!');
+                diamondAmount.value = '';
+                diamondPrice.value = '';
+                loadDiamonds();
+            })
+            .catch(error => {
+                alert(`د الماس ثبتولو کې ستونزه: ${error.message}`);
+            });
+        });
+        
+        // Load diamonds
         function loadDiamonds() {
+            diamondsList.innerHTML = '';
+            
             db.collection('diamonds')
                 .orderBy('amount')
                 .get()
-                .then((querySnapshot) => {
-                    diamonds = [];
-                    diamondsList.innerHTML = '';
+                .then(snap => {
+                    if (snap.empty) {
+                        diamondsList.innerHTML = '<tr><td colspan="3">هیڅ الماس نشته</td></tr>';
+                        return;
+                    }
                     
-                    querySnapshot.forEach((doc) => {
+                    snap.forEach(doc => {
                         const diamond = doc.data();
-                        diamonds.push(diamond);
-                        
-                        const diamondElement = document.createElement('div');
-                        diamondElement.className = 'diamond-option';
-                        diamondElement.innerHTML = `
-                            <div>${diamond.amount} الماس</div>
-                            <div class="diamond-price">${diamond.price} افغانۍ</div>
+                        diamondsList.innerHTML += `
+                            <tr>
+                                <td>${diamond.amount}</td>
+                                <td>${diamond.price} افغانۍ</td>
+                                <td><button class="delete-btn" data-id="${doc.id}">حذف</button></td>
+                            </tr>
                         `;
-                        
-                        diamondsList.appendChild(diamondElement);
                     });
-                })
-                .catch((error) => {
-                    console.error('Error loading diamonds:', error);
+                    
+                    // Add delete event listeners
+                    document.querySelectorAll('#diamonds-list .delete-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            if (confirm('آیا تاسو ډاډه یاست چې دا الماس حذف کړئ؟')) {
+                                db.collection('diamonds').doc(e.target.dataset.id).delete()
+                                    .then(() => {
+                                        loadDiamonds();
+                                    });
+                            }
+                        });
+                    });
                 });
         }
         
-        // Initialize the app
+        // Initialize app
         function initApp() {
-            auth.onAuthStateChanged((user) => {
-                currentUser = user;
-                updateUIForAuth();
-                
-                if (user) {
-                    // User is signed in
-                    console.log('User is signed in:', user);
+            auth.onAuthStateChanged(user => {
+                if (!user) {
+                    window.location.href = 'index.html';
                 } else {
-                    // User is signed out
-                    console.log('User is signed out');
+                    // Check if user is admin
+                    db.collection('admins').doc(user.uid).get()
+                        .then(doc => {
+                            if (!doc.exists) {
+                                auth.signOut();
+                                window.location.href = 'index.html';
+                            } else {
+                                // Load all data
+                                loadStats();
+                                loadRecentAccounts();
+                                loadAllAccounts();
+                                loadDiamonds();
+                            }
+                        });
                 }
-                
-                // Load data
-                loadAccounts();
-                loadNotifications();
-                loadDiamonds();
             });
         }
         
@@ -1269,4 +563,4 @@
         window.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
-</html>   
+</html> 

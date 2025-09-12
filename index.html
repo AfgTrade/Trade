@@ -1,566 +1,265 @@
 <!DOCTYPE html>
-<html lang="ps" dir="rtl">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Fire Afghan - اډمین پینل</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tahoma&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Tahoma', sans-serif;
-        }
-        
-        body {
-            background-color: #f5f5f5;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        
-        header {
-            background-color: #FF5722;
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo {
-            font-size: 20px;
-            font-weight: bold;
-        }
-        
-        .logout-btn {
-            background-color: white;
-            color: #FF5722;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        
-        .tabs {
-            display: flex;
-            background-color: #eee;
-        }
-        
-        .tab {
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-        
-        .tab.active {
-            background-color: white;
-            font-weight: bold;
-        }
-        
-        .tab-content {
-            padding: 20px;
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        .card {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .card-title {
-            font-size: 18px;
-            margin-bottom: 15px;
-            color: #333;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        th, td {
-            padding: 10px;
-            text-align: right;
-            border-bottom: 1px solid #eee;
-        }
-        
-        th {
-            background-color: #f9f9f9;
-        }
-        
-        .delete-btn {
-            background-color: #f44336;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        
-        .submit-btn {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        .stat-card {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            padding: 15px;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        
-        .stat-title {
-            color: #777;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Telegram Bot UI</title>
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #f7f9fc;
+        min-height: 100vh;
+        overflow-y: auto;
+    }
+
+    /* Header */
+    .header {
+        background: #ff7f6b;
+        color: white;
+        padding: 20px;
+        border-bottom-left-radius: 15px;
+        border-bottom-right-radius: 15px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    .profile-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #4a90e2, #6ab6ff);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 18px;
+        overflow: hidden;
+    }
+    .profile-icon img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    .header-text {
+        line-height: 1.2;
+    }
+    .header-text h3 {
+        margin: 0;
+        font-size: 18px;
+    }
+    .header-text span {
+        font-size: 14px;
+    }
+
+    /* Welcome Section */
+    .welcome-card {
+        background: white;
+        margin: 15px;
+        border-radius: 15px;
+        padding: 15px;
+        text-align: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    .welcome-card h4 {
+        margin: 5px 0;
+        font-size: 16px;
+    }
+    .welcome-card p {
+        margin: 0;
+        color: gray;
+        font-size: 13px;
+    }
+    .earn-btn {
+        background: #ff7f6b;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 25px;
+        border: none;
+        margin: 15px 0;
+        font-size: 14px;
+        cursor: pointer;
+    }
+    .welcome-card img {
+        max-width: 80px;
+        margin-top: 10px;
+    }
+
+    /* Card Styles */
+    .info-card {
+        background: #ff7f6b;
+        color: white;
+        margin: 15px;
+        border-radius: 15px;
+        padding: 20px;
+        position: relative;
+    }
+    .info-card h3 {
+        margin: 0;
+        font-size: 20px;
+    }
+    .info-card p {
+        font-size: 13px;
+        margin-top: 5px;
+        opacity: 0.9;
+    }
+
+    /* Favourite Button */
+    .fav-btn {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(255,255,255,0.2);
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+        position: absolute;
+        right: 15px;
+        bottom: 15px;
+        cursor: pointer;
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(45deg, #d6246e, #f77062);
+        display: flex;
+        justify-content: space-around;
+        padding: 10px 0;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+    .bottom-nav a {
+        color: white;
+        text-align: center;
+        font-size: 12px;
+        text-decoration: none;
+    }
+    .bottom-nav i {
+        display: block;
+        font-size: 18px;
+        margin-bottom: 3px;
+    }
+
+    /* Extra space for scroll */
+    .bottom-space {
+        height: 70px;
+    }
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="logo">Free Fire Afghan - اډمین پینل</div>
-            <button class="logout-btn" id="logout-btn">وتل</button>
-        </header>
-        
-        <div class="tabs">
-            <div class="tab active" data-tab="dashboard">ډشبورډ</div>
-            <div class="tab" data-tab="accounts">اکاونټونه</div>
-            <div class="tab" data-tab="notifications">خبرتیاوې</div>
-            <div class="tab" data-tab="diamonds">الماسونه</div>
-        </div>
-        
-        <div class="tab-content active" id="dashboard-content">
-            <div class="card">
-                <div class="card-title">احصائیه</div>
-                
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                    <div class="stat-card">
-                        <div class="stat-title">ټول اکاونټونه</div>
-                        <div class="stat-value" id="total-accounts">0</div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-title">فعال اکاونټونه</div>
-                        <div class="stat-value" id="active-accounts">0</div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-title">کارونکي</div>
-                        <div class="stat-value" id="total-users">0</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-title">وروستي اکاونټونه</div>
-                
-                <table>
-                    <thead>
-                        <tr>
-                            <th>نوم</th>
-                            <th>لیول</th>
-                            <th>قیمت</th>
-                            <th>عملیې</th>
-                        </tr>
-                    </thead>
-                    <tbody id="recent-accounts">
-                        <!-- وروستي اکاونټونه به دلته ښکاره شي -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        
-        <div class="tab-content" id="accounts-content">
-            <div class="card">
-                <div class="card-title">ټول اکاونټونه</div>
-                
-                <table>
-                    <thead>
-                        <tr>
-                            <th>نوم</th>
-                            <th>لیول</th>
-                            <th>قیمت</th>
-                            <th>پلورونکی</th>
-                            <th>عملیې</th>
-                        </tr>
-                    </thead>
-                    <tbody id="all-accounts">
-                        <!-- ټول اکاونټونه به دلته ښکاره شي -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        
-        <div class="tab-content" id="notifications-content">
-            <div class="card">
-                <div class="card-title">نوې خبرتیا</div>
-                
-                <form id="notification-form">
-                    <div class="form-group">
-                        <label for="notification-title">سرلیک</label>
-                        <input type="text" id="notification-title" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="notification-message">پیغام</label>
-                        <textarea id="notification-message" rows="4" required></textarea>
-                    </div>
-                    
-                    <button type="submit" class="submit-btn">خبرتیا واستوئ</button>
-                </form>
-            </div>
-        </div>
-        
-        <div class="tab-content" id="diamonds-content">
-            <div class="card">
-                <div class="card-title">د الماسونو قیمتونه</div>
-                
-                <form id="diamond-form">
-                    <div class="form-group">
-                        <label for="diamond-amount">مقدار</label>
-                        <input type="number" id="diamond-amount" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="diamond-price">قیمت (افغانیو کی)</label>
-                        <input type="number" id="diamond-price" required>
-                    </div>
-                    
-                    <button type="submit" class="submit-btn">ثبتول</button>
-                </form>
-                
-                <table style="margin-top: 20px;">
-                    <thead>
-                        <tr>
-                            <th>مقدار</th>
-                            <th>قیمت</th>
-                            <th>عملیې</th>
-                        </tr>
-                    </thead>
-                    <tbody id="diamonds-list">
-                        <!-- الماسونه به دلته ښکاره شي -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+<!-- Header -->
+<div class="header">
+    <div class="user-avatar" id="profile-pic">DH</div>
+    <div class="header-text">
+        <h2 class="username" id="username">Loading...</h2>
+        <span id="balance">82.39 VET</span>
+    </div>
+</div>
+
+<!-- Welcome Section -->
+<div class="welcome-card">
+    <h4 id="username">Welcome Developer Hasib</h4>
+    <p>Start Earning Money Now</p>
+    <img src="https://i.ibb.co/XJWf8WD/businessman.png" alt="Businessman">
+    <br>
+    <button class="earn-btn">Earn Now</button>
+</div>
+
+<!-- Total Earnings Card -->
+<div class="info-card">
+    <h3>$ 80 VET</h3>
+    <p>Total Earnings</p>
+    <div class="fav-btn">
+        <i class="fa fa-heart"></i>
+        <span>Earning Received</span>
+    </div>
+</div>
+
+<!-- Total Ads View Card -->
+<div class="info-card">
+    <h3>20</h3>
+    <p>Total Ads View</p>
+</div>
+
+<!-- Extra space for bottom nav -->
+<div class="bottom-space"></div>
+
+<!-- Bottom Navigation -->
+<div class="bottom-nav">
+    <a href="#"><i class="fa fa-home"></i>Home</a>
+    <a href="#"><i class="fa fa-money-bill"></i>Earn</a>
+    <a href="#"><i class="fa fa-wallet"></i>Withdraw</a>
+    <a href="#"><i class="fa fa-user"></i>Profile</a>
+</div>
     
     <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyD4UbW_Iy4kUWH3V70Q1mWCI4-_KFk6ku4",
-            authDomain: "onlinewark-a0147.firebaseapp.com",
-            databaseURL: "https://onlinewark-a0147-default-rtdb.firebaseio.com",
-            projectId: "onlinewark-a0147",
-            storageBucket: "onlinewark-a0147.appspot.com",
-            messagingSenderId: "92155538620",
-            appId: "1:92155538620:android:5e198a8eea6bf17f61f4b9"
-        };
-        
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        
-        // DOM Elements
-        const tabs = document.querySelectorAll('.tab');
-        const tabContents = document.querySelectorAll('.tab-content');
-        const logoutBtn = document.getElementById('logout-btn');
-        
-        // Stats
-        const totalAccountsEl = document.getElementById('total-accounts');
-        const activeAccountsEl = document.getElementById('active-accounts');
-        const totalUsersEl = document.getElementById('total-users');
-        
-        // Accounts
-        const recentAccountsEl = document.getElementById('recent-accounts');
-        const allAccountsEl = document.getElementById('all-accounts');
-        
-        // Notifications
-        const notificationForm = document.getElementById('notification-form');
-        const notificationTitle = document.getElementById('notification-title');
-        const notificationMessage = document.getElementById('notification-message');
-        
-        // Diamonds
-        const diamondForm = document.getElementById('diamond-form');
-        const diamondAmount = document.getElementById('diamond-amount');
-        const diamondPrice = document.getElementById('diamond-price');
-        const diamondsList = document.getElementById('diamonds-list');
-        
-        // Tab switching
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                tabs.forEach(t => t.classList.remove('active'));
-                tabContents.forEach(c => c.classList.remove('active'));
-                
-                tab.classList.add('active');
-                document.getElementById(`${tab.dataset.tab}-content`).classList.add('active');
-            });
-        });
-        
-        // Logout
-        logoutBtn.addEventListener('click', () => {
-            auth.signOut().then(() => {
-                window.location.href = 'index.html';
-            });
-        });
-        
-        // Load stats
-        function loadStats() {
-            // Total accounts
-            db.collection('accounts').get().then(snap => {
-                totalAccountsEl.textContent = snap.size;
-                
-                let active = 0;
-                snap.forEach(doc => {
-                    if (doc.data().status === 'active') active++;
-                });
-                activeAccountsEl.textContent = active;
-            });
-            
-            // Total users
-            db.collection('users').get().then(snap => {
-                totalUsersEl.textContent = snap.size;
-            });
+    
+       // --- Core App Logic ---
+
+    document.addEventListener('DOMContentLoaded', () => {
+
+        initApp();
+
+    });
+
+
+
+    function initApp() {
+
+        if (window.Telegram && Telegram.WebApp) {
+
+            Telegram.WebApp.ready();
+
+            Telegram.WebApp.expand();
+
+            tgUser = Telegram.WebApp.initDataUnsafe.user;
+
         }
+
         
-        // Load recent accounts
-        function loadRecentAccounts() {
-            recentAccountsEl.innerHTML = '';
-            
-            db.collection('accounts')
-                .orderBy('createdAt', 'desc')
-                .limit(5)
-                .get()
-                .then(snap => {
-                    if (snap.empty) {
-                        recentAccountsEl.innerHTML = '<tr><td colspan="4">هیڅ اکاونټ نشته</td></tr>';
-                        return;
-                    }
-                    
-                    snap.forEach(doc => {
-                        const account = doc.data();
-                        recentAccountsEl.innerHTML += `
-                            <tr>
-                                <td>${account.name}</td>
-                                <td>${account.level}</td>
-                                <td>${account.price} افغانۍ</td>
-                                <td><button class="delete-btn" data-id="${doc.id}">حذف</button></td>
-                            </tr>
-                        `;
-                    });
-                    
-                    // Add delete event listeners
-                    document.querySelectorAll('#recent-accounts .delete-btn').forEach(btn => {
-                        btn.addEventListener('click', (e) => {
-                            if (confirm('آیا تاسو ډاډه یاست چې دا اکاونټ حذف کړئ؟')) {
-                                db.collection('accounts').doc(e.target.dataset.id).delete()
-                                    .then(() => {
-                                        loadRecentAccounts();
-                                        loadAllAccounts();
-                                        loadStats();
-                                    });
-                            }
-                        });
-                    });
-                });
+
+        loadData();
+
+        loadTelegramUser();
+
+        showView('home-view');
+
+        renderLeaderboard();
+
+        
+
+
+    // --- User & Profile ---
+
+    function loadTelegramUser() {
+
+        if (tgUser) {
+
+            document.getElementById('username').textContent = tgUser.first_name || 'Telegram User';
+
+            const profilePicDiv = document.getElementById('profile-pic');
+
+            if (tgUser.photo_url) {
+
+                profilePicDiv.innerHTML = `<img src="${tgUser.photo_url}" alt="P">`;
+
+            } else {
+
+                profilePicDiv.textContent = (tgUser.first_name || 'U').charAt(0);
+
+            }
+
         }
-        
-        // Load all accounts
-        function loadAllAccounts() {
-            allAccountsEl.innerHTML = '';
-            
-            db.collection('accounts')
-                .orderBy('createdAt', 'desc')
-                .get()
-                .then(snap => {
-                    if (snap.empty) {
-                        allAccountsEl.innerHTML = '<tr><td colspan="5">هیڅ اکاونټ نشته</td></tr>';
-                        return;
-                    }
-                    
-                    snap.forEach(doc => {
-                        const account = doc.data();
-                        allAccountsEl.innerHTML += `
-                            <tr>
-                                <td>${account.name}</td>
-                                <td>${account.level}</td>
-                                <td>${account.price} افغانۍ</td>
-                                <td>${account.sellerUsername || 'نشته'}</td>
-                                <td><button class="delete-btn" data-id="${doc.id}">حذف</button></td>
-                            </tr>
-                        `;
-                    });
-                    
-                    // Add delete event listeners
-                    document.querySelectorAll('#all-accounts .delete-btn').forEach(btn => {
-                        btn.addEventListener('click', (e) => {
-                            if (confirm('آیا تاسو ډاډه یاست چې دا اکاونټ حذف کړئ؟')) {
-                                db.collection('accounts').doc(e.target.dataset.id).delete()
-                                    .then(() => {
-                                        loadRecentAccounts();
-                                        loadAllAccounts();
-                                        loadStats();
-                                    });
-                            }
-                        });
-                    });
-                });
-        }
-        
-        // Send notification
-        notificationForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            db.collection('notifications').add({
-                title: notificationTitle.value,
-                message: notificationMessage.value,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            })
-            .then(() => {
-                alert('خبرتیا په بریالیتوب سره ولېږل شوه!');
-                notificationTitle.value = '';
-                notificationMessage.value = '';
-            })
-            .catch(error => {
-                alert(`د خبرتیا لیږلو کې ستونزه: ${error.message}`);
-            });
-        });
-        
-        // Add diamond price
-        diamondForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            db.collection('diamonds').add({
-                amount: diamondAmount.value,
-                price: diamondPrice.value,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            })
-            .then(() => {
-                alert('د الماس قیمت په بریالیتوب سره ثبت شو!');
-                diamondAmount.value = '';
-                diamondPrice.value = '';
-                loadDiamonds();
-            })
-            .catch(error => {
-                alert(`د الماس ثبتولو کې ستونزه: ${error.message}`);
-            });
-        });
-        
-        // Load diamonds
-        function loadDiamonds() {
-            diamondsList.innerHTML = '';
-            
-            db.collection('diamonds')
-                .orderBy('amount')
-                .get()
-                .then(snap => {
-                    if (snap.empty) {
-                        diamondsList.innerHTML = '<tr><td colspan="3">هیڅ الماس نشته</td></tr>';
-                        return;
-                    }
-                    
-                    snap.forEach(doc => {
-                        const diamond = doc.data();
-                        diamondsList.innerHTML += `
-                            <tr>
-                                <td>${diamond.amount}</td>
-                                <td>${diamond.price} افغانۍ</td>
-                                <td><button class="delete-btn" data-id="${doc.id}">حذف</button></td>
-                            </tr>
-                        `;
-                    });
-                    
-                    // Add delete event listeners
-                    document.querySelectorAll('#diamonds-list .delete-btn').forEach(btn => {
-                        btn.addEventListener('click', (e) => {
-                            if (confirm('آیا تاسو ډاډه یاست چې دا الماس حذف کړئ؟')) {
-                                db.collection('diamonds').doc(e.target.dataset.id).delete()
-                                    .then(() => {
-                                        loadDiamonds();
-                                    });
-                            }
-                        });
-                    });
-                });
-        }
-        
-        // Initialize app
-        function initApp() {
-            auth.onAuthStateChanged(user => {
-                if (!user) {
-                    window.location.href = 'index.html';
-                } else {
-                    // Check if user is admin
-                    db.collection('admins').doc(user.uid).get()
-                        .then(doc => {
-                            if (!doc.exists) {
-                                auth.signOut();
-                                window.location.href = 'index.html';
-                            } else {
-                                // Load all data
-                                loadStats();
-                                loadRecentAccounts();
-                                loadAllAccounts();
-                                loadDiamonds();
-                            }
-                        });
-                }
-            });
-        }
-        
-        // Start the app
-        window.addEventListener('DOMContentLoaded', initApp);
-    </script>
+
+    }
+</script>
 </body>
-</html> 
+</html>
